@@ -147,6 +147,29 @@
   .tag:hover { border-color:var(--border-hover); color:var(--text); transform:translateY(-1px); }
   .tag.active { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 4px 12px var(--accent-glow); }
 
+  /* ========== 分类侧边栏 ========== */
+  .main-layout { max-width:1280px; margin:0 auto; padding:0 24px 60px; display:flex; gap:24px; align-items:flex-start; }
+  .category-sidebar {
+    width:180px; flex-shrink:0; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:20px 0; position:sticky; top:80px;
+    box-shadow:var(--card-shadow);
+  }
+  .sidebar-title { font-size:0.85rem; font-weight:700; color:var(--text); padding:0 20px 14px; border-bottom:1px solid var(--border); margin-bottom:8px; letter-spacing:0.5px; }
+  .category-list { display:flex; flex-direction:column; }
+  .cat-item {
+    display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer;
+    transition:all 0.2s; border-left:3px solid transparent; font-size:0.85rem;
+    color:var(--text-dim); user-select:none;
+  }
+  .cat-item:hover { background:var(--surface2); color:var(--text); }
+  .cat-item.active {
+    background:var(--accent-glow); color:var(--accent); font-weight:600;
+    border-left-color:var(--accent);
+  }
+  .cat-icon { font-size:1.1rem; width:24px; text-align:center; flex-shrink:0; }
+  .cat-name { white-space:nowrap; }
+  .main-content { flex:1; min-width:0; }
+
   /* ========== Grid ========== */
   .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
   .card {
@@ -491,6 +514,13 @@
     .hero-stat .num { font-size:1.5rem; }
     .grid { grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
     .toolbar { flex-direction:column; padding:0 16px 20px; }
+    .main-layout { flex-direction:column; padding:0 16px 40px; }
+    .category-sidebar { width:100%; position:static; padding:12px 0; }
+    .category-list { flex-direction:row; flex-wrap:wrap; gap:4px; padding:0 12px; }
+    .cat-item { padding:6px 12px; border-left:none; border-radius:20px; font-size:0.78rem; gap:4px; }
+    .cat-item.active { border-left:none; border-radius:20px; }
+    .cat-icon { font-size:0.85rem; width:auto; }
+    .sidebar-title { display:none; }
     .nav-links { display:none; }
     .navbar { padding:0 16px; }
     .modal { width:96%; border-radius:var(--radius); }
@@ -568,6 +598,19 @@
   .pexels-count {
     font-size:0.8rem; color:var(--text-dim); white-space:nowrap;
   }
+  .load-more-wrap {
+    grid-column:1/-1; text-align:center; padding:32px 0 48px;
+  }
+  .load-more-btn {
+    background:var(--accent); color:#fff; border:none;
+    padding:12px 40px; border-radius:50px; font-size:0.95rem;
+    font-weight:600; cursor:pointer; transition:all 0.3s;
+    letter-spacing:0.5px;
+  }
+  .load-more-btn:hover {
+    background:#5a4bd1; transform:translateY(-1px);
+    box-shadow:0 4px 20px rgba(99,102,241,0.4);
+  }
 </style>
 </head>
 <body>
@@ -631,6 +674,14 @@ const ASSETS = [
   { id:10, title:'霓虹街道慢镜头', cat:'城市建筑', res:'4K', dur:'0:42', size:'290MB', fps:60, format:'MP4', badge:'free',   desc:'雨天霓虹街道慢动作拍摄，灯光倒影，充满电影感。' },
   { id:11, title:'火焰燃烧转场',   cat:'特效转场', res:'4K', dur:'0:08', size:'45MB',  fps:60, format:'MOV', badge:'free',   desc:'火焰燃烧转场素材，Alpha通道，适合动作类视频过渡。' },
   { id:12, title:'星空银河延时',   cat:'自然风光', res:'8K', dur:'1:30', size:'780MB', fps:24, format:'MP4', badge:'pro',    desc:'璀璨星空银河延时摄影，斗转星移，震撼人心。' },
+  { id:13, title:'狮子草原漫步',   cat:'动物世界', res:'4K', dur:'0:35', size:'280MB', fps:60, format:'MP4', badge:'free',   desc:'非洲大草原雄狮悠闲漫步，阳光洒在金色鬃毛上，野性之美。' },
+  { id:14, title:'咖啡拉花特写',   cat:'美食饮品', res:'4K', dur:'0:20', size:'120MB', fps:60, format:'MP4', badge:'free',   desc:'咖啡师制作精致拉花的慢动作特写，适合美食探店视频。' },
+  { id:15, title:'篮球扣篮瞬间',   cat:'体育运动', res:'4K', dur:'0:10', size:'90MB',  fps:120,format:'MOV', badge:'pro',    desc:'NBA级别篮球扣篮高速摄影，肌肉线条与运动美感尽显。' },
+  { id:16, title:'日出瑜伽剪影',   cat:'人物生活', res:'4K', dur:'0:28', size:'180MB', fps:30, format:'MP4', badge:'free',   desc:'海边日出时瑜伽冥想剪影，宁静美好，适合健康生活类视频。' },
+  { id:17, title:'金融市场数据屏', cat:'商业金融', res:'4K', dur:'0:22', size:'160MB', fps:30, format:'MP4', badge:'pro',    desc:'股票交易大屏实时数据跳动，适合财经新闻与商业分析视频。' },
+  { id:18, title:'手术室无影灯',   cat:'医疗健康', res:'4K', dur:'0:15', size:'110MB', fps:24, format:'MP4', badge:'pro',    desc:'现代化手术室设备展示，干净明亮的医疗环境素材。' },
+  { id:19, title:'儿童课堂互动',   cat:'教育学习', res:'4K', dur:'0:33', size:'200MB', fps:30, format:'MP4', badge:'free',   desc:'小朋友在课堂上积极举手互动，适合教育类宣传视频。' },
+  { id:20, title:'极光舞动夜空',   cat:'自然风光', res:'8K', dur:'1:10', size:'620MB', fps:24, format:'MP4', badge:'pro',    desc:'冰岛极光在夜空中舞动的延时摄影，色彩斑斓令人惊叹。' },
 ];
 
 // === 数据持久化 ===
@@ -652,6 +703,9 @@ const PEXELS_KEY = localStorage.getItem('pexels_api_key') || '';
 let pexelsResults = [];
 let pexelsEnabled = false;
 let pexelsLoading = false;
+let pexelsPage = 1;
+let pexelsQuery = '';
+let pexelsHasMore = false;
 
 function setPexelsKey(key) {
   localStorage.setItem('pexels_api_key', key);
@@ -659,10 +713,10 @@ function setPexelsKey(key) {
 }
 
 async function fetchPexelsVideos(q, page = 1) {
-  if (!PEXELS_KEY) { pexelsResults = []; return []; }
+  if (!PEXELS_KEY) { pexelsResults = []; pexelsHasMore = false; return []; }
   pexelsLoading = true;
   try {
-    const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=30&page=${page}`, {
+    const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=80&page=${page}`, {
       headers: { 'Authorization': PEXELS_KEY }
     });
     const data = await res.json();
@@ -685,11 +739,17 @@ async function fetchPexelsVideos(q, page = 1) {
       videoFile: bestVideo(v.video_files),
       videoOptions: v.video_files
     }));
-    pexelsResults = videos;
+    if (page === 1) {
+      pexelsResults = videos;
+    } else {
+      pexelsResults = pexelsResults.concat(videos);
+    }
+    pexelsHasMore = data.total_results > page * 80;
     return videos;
   } catch (e) {
     console.error('Pexels fetch error:', e);
-    pexelsResults = [];
+    if (page === 1) pexelsResults = [];
+    pexelsHasMore = false;
     return [];
   } finally { pexelsLoading = false; }
 }
@@ -733,9 +793,24 @@ function togglePexels() {
 }
 
 async function searchPexels(q) {
+  pexelsPage = 1;
+  pexelsQuery = q;
   pexelsLoading = true;
   renderGrid();
-  await fetchPexelsVideos(q);
+  await fetchPexelsVideos(q, 1);
+  renderGrid();
+}
+
+async function loadMorePexels() {
+  if (!pexelsHasMore || pexelsLoading) return;
+  pexelsPage++;
+  pexelsLoading = true;
+  const grid = document.getElementById('assetGrid');
+  if (grid) {
+    const btn = grid.querySelector('.load-more-btn');
+    if (btn) btn.textContent = '加载中...';
+  }
+  await fetchPexelsVideos(pexelsQuery, pexelsPage);
   renderGrid();
 }
 
@@ -878,15 +953,24 @@ function renderHome() {
     <section class="hero"><h1>高质量<span>视频素材</span>一站下载</h1><p>精选 4K / 8K 高清素材，覆盖自然风光、城市夜景、科技特效等多种场景，助你快速产出专业级视频。</p><div class="hero-stats"><div class="hero-stat"><div class="num">200+</div><div class="label">高清素材</div></div><div class="hero-stat"><div class="num">4K / 8K</div><div class="label">最高分辨率</div></div><div class="hero-stat"><div class="num">免费</div><div class="label">个人 &amp; 商用</div></div></div></section>
     <div class="toolbar">
       <div class="pexels-search-row">
-        <div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="${pexelsEnabled ? '搜索 Pexels 视频素材...' : '搜索素材关键词...'}" oninput="onSearchInput()"></div>
+        <div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="${pexelsEnabled ? '搜索 Pexels 视频素材（支持中文）...' : '搜索素材关键词...'}" oninput="onSearchInput()"></div>
         <div class="pexels-toggle${pexelsEnabled?' active':''}" onclick="togglePexels()" id="pexelsToggleBtn">
           <span class="pexels-dot"></span>Pexels 搜索
         </div>
         ${pexelsResults.length ? `<span class="pexels-count">${pexelsResults.length} 个结果</span>` : ''}
       </div>
-      <div class="filter-tags" id="filterTags">${cats.map(c=>`<span class="tag${c===activeCat?' active':''}" onclick="setCategory('${c}')">${c}</span>`).join('')}</div>
     </div>
-    <div class="page-container"><div class="grid" id="assetGrid"></div></div>
+    <div class="main-layout">
+      <aside class="category-sidebar">
+        <h3 class="sidebar-title">素材分类</h3>
+        <div class="category-list">
+          ${cats.map(c=>`<div class="cat-item${c===activeCat?' active':''}" onclick="pickCategory('${c}')"><span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${c}</span></div>`).join('')}
+        </div>
+      </aside>
+      <div class="main-content">
+        <div class="grid" id="assetGrid"></div>
+      </div>
+    </div>
   `;
   renderGrid();
 }
@@ -915,9 +999,39 @@ function renderGrid() {
         ${a.pexels?`<p class="pexels-credit">by <a href="${a.pexelsUserUrl}" target="_blank">${a.pexelsUser}</a></p>`:''}
       </div></div>
   `).join('');
+  if (pexelsEnabled && pexelsHasMore && !pexelsLoading) {
+    grid.innerHTML += `<div class="load-more-wrap"><button class="load-more-btn" onclick="loadMorePexels()">加载更多 (当前已显示 ${pexelsResults.length} 个)</button></div>`;
+  }
   requestAnimationFrame(()=>document.querySelectorAll('.card.reveal').forEach(el=>el.classList.add('visible')));
 }
-function setCategory(cat){ activeCat=cat; if(pexelsEnabled){pexelsEnabled=false;pexelsResults=[];} renderHome(); }
+function setCategory(cat){
+  activeCat = cat;
+  if (pexelsEnabled) {
+    if (cat === '全部') {
+      pexelsEnabled = false;
+      pexelsResults = [];
+    } else {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.value = cat;
+      searchPexels(cat);
+      return;
+    }
+  }
+  renderHome();
+}
+
+function pickCategory(cat) {
+  setCategory(cat);
+}
+
+function catIcon(cat) {
+  const m = {
+    '全部':'📂','自然风光':'🏔️','城市建筑':'🏙️','科技特效':'💻',
+    '特效转场':'✨','动物世界':'🦁','美食饮品':'☕','体育运动':'⚽',
+    '人物生活':'👤','商业金融':'📊','医疗健康':'🏥','教育学习':'📚'
+  };
+  return m[cat] || '📁';
+}
 function onSearchInput() {
   if (pexelsEnabled) {
     clearTimeout(window._pexelsDebounce);
