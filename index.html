@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelStock - 高清视频素材库</title>
+<meta name="description" content="PixelStock 高清视频素材库，精选 4K/8K 视频素材免费下载，覆盖自然风光、城市建筑、科技特效等多种场景。">
+<style>
+  /* ========== 主题变量 ========== */
+  :root {
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0a0a0f; --bg2: #0f0f17; --surface: #13131a; --surface2: #1a1a24;
+    --surface3: #22222e; --border: #252530; --border-hover: #3a3a4a;
+    --text: #e4e4eb; --text2: #b0b0c0; --text-dim: #8888a0;
+    --accent: #6c5ce7; --accent2: #a29bfe; --accent-glow: rgba(108,92,231,0.25);
+    --tag-bg: #1e1e2e; --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --card-shadow-hover: 0 16px 48px rgba(108,92,231,0.18);
+    --nav-bg: rgba(10,10,15,0.82); --hero-glow: radial-gradient(ellipse at 50% 50%, rgba(108,92,231,0.1) 0%, transparent 70%);
+    --toast-bg: #1a1a24; --overlay-bg: rgba(0,0,0,0.88); --input-bg: #1a1a24;
+    --scrollbar-thumb: #2a2a38; --scrollbar-track: transparent;
+    --success: #00b894; --danger: #ff7675;
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5fa; --bg2: #fafafe; --surface: #ffffff; --surface2: #f0f0f8;
+    --surface3: #e8e8f2; --border: #e0e0ec; --border-hover: #c8c8d8;
+    --text: #1a1a2e; --text2: #4a4a5e; --text-dim: #8888a0;
+    --accent: #6c5ce7; --accent2: #5a4bd1; --accent-glow: rgba(108,92,231,0.15);
+    --tag-bg: #e8e8f4; --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    --card-shadow-hover: 0 12px 36px rgba(108,92,231,0.12);
+    --nav-bg: rgba(255,255,255,0.82); --hero-glow: radial-gradient(ellipse at 50% 50%, rgba(108,92,231,0.06) 0%, transparent 70%);
+    --toast-bg: #ffffff; --overlay-bg: rgba(0,0,0,0.6); --input-bg: #f0f0f8;
+    --scrollbar-thumb: #c8c8d8; --scrollbar-track: #f0f0f8;
+    --success: #00b894; --danger: #e17055;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font); background: var(--bg);
+    color: var(--text); line-height: 1.6; overflow-x: hidden;
+    transition: background var(--transition), color var(--transition);
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes scaleIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+  @keyframes shimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* ========== Navbar ========== */
+  .navbar {
+    position:sticky; top:0; z-index:100; background:var(--nav-bg);
+    backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%);
+    border-bottom:1px solid var(--border); padding:0 24px;
+    display:flex; align-items:center; justify-content:space-between; height:62px;
+    transition:background var(--transition),border-color var(--transition);
+  }
+  .nav-logo {
+    font-size:1.4rem; font-weight:800; cursor:pointer;
+    background:linear-gradient(135deg,#6c5ce7,#a29bfe);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-0.5px;
+  }
+  .nav-links { display:flex; gap:28px; list-style:none; }
+  .nav-links a {
+    color:var(--text-dim); text-decoration:none; font-size:0.9rem;
+    transition:var(--transition); font-weight:500; position:relative; padding:4px 0; cursor:pointer;
+  }
+  .nav-links a::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:var(--accent); border-radius:1px; transition:width var(--transition); }
+  .nav-links a:hover, .nav-links a.active { color:var(--text); }
+  .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
+  .nav-actions { display:flex; gap:10px; align-items:center; }
+
+  .theme-toggle {
+    width:38px; height:38px; border-radius:50%; background:var(--surface2);
+    border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem; transition:var(--transition); position:relative; overflow:hidden;
+  }
+  .theme-toggle:hover { border-color:var(--accent); transform:rotate(15deg); }
+  .theme-toggle .icon-sun, .theme-toggle .icon-moon { position:absolute; transition:var(--transition); }
+  [data-theme="dark"] .icon-sun { opacity:1; transform:scale(1); }
+  [data-theme="dark"] .icon-moon { opacity:0; transform:scale(0.5); }
+  [data-theme="light"] .icon-sun { opacity:0; transform:scale(0.5); }
+  [data-theme="light"] .icon-moon { opacity:1; transform:scale(1); }
+
+  /* ========== 按钮 ========== */
+  .btn {
+    padding:9px 22px; border-radius:var(--radius-sm); border:none;
+    font-size:0.875rem; font-weight:600; cursor:pointer;
+    transition:all var(--transition); font-family:inherit; position:relative; overflow:hidden;
+  }
+  .btn:active { transform:scale(0.96); }
+  .btn-primary { background:var(--accent); color:#fff; box-shadow:0 4px 16px var(--accent-glow); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px var(--accent-glow); }
+  .btn-outline { background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); background:var(--surface2); }
+  .btn-sm { padding:6px 16px; font-size:0.8rem; }
+  .btn-download { background:linear-gradient(135deg,#00b894,#00cec9); color:#fff; border:none; }
+  .btn-download:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,184,148,0.35); }
+  .btn-lg { padding:12px 32px; font-size:1rem; }
+  .btn-danger { background:var(--danger); color:#fff; }
+
+  .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.3); transform:scale(0); animation:ripple 0.6s ease-out; pointer-events:none; }
+  @keyframes ripple { to { transform:scale(4); opacity:0; } }
+
+  /* ========== 页面容器 ========== */
+  .page { animation:fadeInUp 0.4s ease; min-height:calc(100vh - 62px); }
+  .page-container { max-width:1280px; margin:0 auto; padding:0 24px 60px; }
+
+  /* ========== Hero（首页） ========== */
+  .hero {
+    padding:90px 24px 70px; text-align:center; position:relative; overflow:hidden;
+  }
+  .hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:var(--hero-glow); pointer-events:none; }
+  .hero h1 { font-size:clamp(2rem,5vw,3.4rem); font-weight:800; letter-spacing:-1.5px; position:relative; }
+  .hero h1 span { background:linear-gradient(135deg,#6c5ce7,#fd79a8,#00cec9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation:shimmer 3s linear infinite; }
+  .hero p { color:var(--text-dim); font-size:1.1rem; max-width:560px; margin:18px auto 0; position:relative; }
+  .hero-stats { display:flex; gap:48px; justify-content:center; margin-top:40px; position:relative; }
+  .hero-stat { text-align:center; }
+  .hero-stat .num { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#6c5ce7,#a29bfe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero-stat .label { font-size:0.82rem; color:var(--text-dim); margin-top:4px; }
+
+  /* ========== Toolbar（首页） ========== */
+  .toolbar { max-width:1280px; margin:0 auto; padding:0 24px 24px; display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .search-box { flex:1; min-width:240px; position:relative; }
+  .search-box input { width:100%; padding:13px 16px 13px 44px; background:var(--input-bg); border:1.5px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.9rem; outline:none; transition:all var(--transition); }
+  .search-box input:focus { border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-glow); }
+  .search-box .icon { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--text-dim); pointer-events:none; }
+  .filter-tags { display:flex; gap:8px; flex-wrap:wrap; }
+  .tag { padding:7px 18px; border-radius:20px; background:var(--tag-bg); color:var(--text-dim); font-size:0.82rem; cursor:pointer; border:1.5px solid transparent; transition:all var(--transition); user-select:none; font-weight:500; }
+  .tag:hover { border-color:var(--border-hover); color:var(--text); transform:translateY(-1px); }
+  .tag.active { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 4px 12px var(--accent-glow); }
+
+  /* ========== Grid ========== */
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:22px; }
+  .card {
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg);
+    overflow:hidden; transition:all var(--transition); cursor:pointer; box-shadow:var(--card-shadow);
+  }
+  .card:hover { border-color:var(--accent); transform:translateY(-6px); box-shadow:var(--card-shadow-hover); }
+  .card-thumb { width:100%; height:190px; background:var(--surface2); position:relative; overflow:hidden; }
+  .card-thumb .thumb-inner { width:100%; height:100%; display:flex; align-items:center; justify-content:center; transition:transform 0.5s ease; }
+  .card:hover .thumb-inner { transform:scale(1.05); }
+  .card-thumb .thumb-icon { font-size:3.2rem; opacity:0.5; transition:all var(--transition); }
+  .card:hover .thumb-icon { opacity:0.7; transform:scale(1.1); }
+  .card-badge { position:absolute; top:12px; right:12px; padding:4px 12px; border-radius:6px; font-size:0.7rem; font-weight:700; letter-spacing:0.5px; pointer-events:none; z-index:2; backdrop-filter:blur(8px); }
+  .card-badge.free { background:rgba(0,184,148,0.88); color:#fff; }
+  .card-badge.pro { background:rgba(253,121,168,0.88); color:#fff; }
+  .card-body { padding:18px; }
+  .card-title { font-size:0.95rem; font-weight:700; margin-bottom:6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .card-meta { display:flex; gap:14px; flex-wrap:wrap; font-size:0.75rem; color:var(--text-dim); margin-bottom:14px; }
+  .card-meta span { display:flex; align-items:center; gap:4px; }
+  .card-actions { display:flex; gap:8px; }
+  .card-actions .btn { flex:1; text-align:center; }
+
+  /* ========== 详情页 ========== */
+  .detail-hero {
+    position:relative; overflow:hidden; padding:60px 0 40px;
+    display:flex; gap:40px; align-items:flex-start;
+  }
+  .detail-preview {
+    flex:0 0 520px; border-radius:var(--radius-lg); overflow:hidden;
+    background:var(--surface2); border:1px solid var(--border);
+    min-height:340px; display:flex; align-items:center; justify-content:center;
+    transition:all var(--transition);
+  }
+  .detail-preview .preview-icon { font-size:6rem; opacity:0.4; }
+  .detail-info { flex:1; }
+  .detail-info h1 { font-size:1.8rem; font-weight:800; margin-bottom:8px; }
+  .detail-info .detail-desc { color:var(--text-dim); font-size:1rem; margin-bottom:24px; line-height:1.7; }
+  .detail-specs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .detail-spec {
+    text-align:center; padding:14px 10px; background:var(--surface2);
+    border-radius:var(--radius-sm); border:1px solid var(--border);
+    transition:var(--transition);
+  }
+  .detail-spec:hover { border-color:var(--accent); }
+  .detail-spec .spec-val { font-size:1.2rem; font-weight:700; }
+  .detail-spec .spec-lbl { font-size:0.75rem; color:var(--text-dim); margin-top:2px; }
+  .detail-actions { display:flex; gap:12px; }
+
+  .back-link {
+    display:inline-flex; align-items:center; gap:6px; color:var(--text-dim);
+    text-decoration:none; font-size:0.85rem; margin-bottom:20px; cursor:pointer;
+    transition:var(--transition);
+  }
+  .back-link:hover { color:var(--accent); }
+
+  /* ========== 关于页 ========== */
+  .about-hero {
+    text-align:center; padding:80px 24px 50px; position:relative;
+  }
+  .about-hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:var(--hero-glow); pointer-events:none; }
+  .about-hero h1 { font-size:2.2rem; font-weight:800; position:relative; }
+  .about-hero .subtitle { color:var(--text-dim); font-size:1rem; margin-top:12px; position:relative; }
+  .about-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:40px; }
+  .about-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:28px; text-align:center;
+    transition:all var(--transition);
+  }
+  .about-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+  .about-card .icon { font-size:2.5rem; margin-bottom:16px; }
+  .about-card h3 { font-size:1.1rem; margin-bottom:8px; }
+  .about-card p { color:var(--text-dim); font-size:0.88rem; line-height:1.6; }
+
+  .about-team { margin-top:50px; text-align:center; }
+  .about-team h2 { font-size:1.5rem; margin-bottom:28px; }
+  .team-grid { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; }
+  .team-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:24px; text-align:center;
+    width:200px; transition:var(--transition);
+  }
+  .team-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+  .team-avatar { width:64px; height:64px; border-radius:50%; background:var(--accent); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.5rem; font-weight:700; }
+  .team-card h4 { font-size:0.95rem; }
+  .team-card .role { color:var(--text-dim); font-size:0.78rem; margin-top:4px; }
+
+  /* ========== 上传页 ========== */
+  .upload-page { padding:60px 0; }
+  .upload-page h1 { font-size:1.8rem; font-weight:800; margin-bottom:8px; }
+  .upload-page .upload-sub { color:var(--text-dim); margin-bottom:32px; }
+  .upload-zone {
+    border:2px dashed var(--border); border-radius:var(--radius-lg);
+    padding:60px 30px; text-align:center; cursor:pointer;
+    transition:all var(--transition); background:var(--surface);
+    margin-bottom:28px;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color:var(--accent); background:var(--surface2);
+    box-shadow:0 0 0 6px var(--accent-glow);
+  }
+  .upload-zone .upload-icon { font-size:3.5rem; margin-bottom:16px; }
+  .upload-zone h3 { font-size:1.1rem; margin-bottom:8px; }
+  .upload-zone p { color:var(--text-dim); font-size:0.85rem; }
+  .upload-form { display:grid; gap:16px; max-width:600px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group label { font-size:0.85rem; font-weight:600; color:var(--text2); }
+  .form-group input, .form-group select, .form-group textarea {
+    padding:11px 14px; background:var(--input-bg); border:1.5px solid var(--border);
+    border-radius:var(--radius-sm); color:var(--text); font-size:0.9rem;
+    outline:none; transition:all var(--transition); font-family:inherit; resize:vertical;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow);
+  }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .upload-preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-top:12px; }
+  .upload-preview-item {
+    background:var(--surface2); border-radius:var(--radius-sm);
+    padding:12px; text-align:center; border:1px solid var(--border);
+    font-size:0.78rem;
+  }
+  .upload-preview-item .file-icon { font-size:1.8rem; margin-bottom:6px; }
+  .upload-preview-item .file-name { color:var(--text); word-break:break-all; }
+  .upload-preview-item .file-size { color:var(--text-dim); font-size:0.7rem; }
+
+  /* ========== Modal ========== */
+  .modal-overlay {
+    position:fixed; inset:0; z-index:200; background:var(--overlay-bg);
+    display:flex; align-items:center; justify-content:center; animation:fadeIn 0.25s ease;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.hidden { display:none; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); max-width:820px; width:92%;
+    max-height:85vh; overflow-y:auto; animation:scaleIn 0.3s ease;
+    box-shadow:0 24px 80px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; background:var(--surface); z-index:1;
+    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .modal-header h3 { font-size:1.15rem; font-weight:700; }
+  .modal-close { background:none; border:none; color:var(--text-dim); font-size:1.5rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:var(--transition); line-height:1; }
+  .modal-close:hover { background:var(--surface2); color:var(--text); }
+  .modal-body { padding:24px; }
+  .modal-preview { width:100%; border-radius:var(--radius); overflow:hidden; background:var(--surface2); margin-bottom:20px; }
+  .modal-preview .preview-placeholder { height:380px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+  .modal-preview .preview-placeholder .preview-icon { font-size:5rem; }
+  .modal-preview .preview-placeholder .preview-meta { color:var(--text-dim); font-size:0.9rem; }
+  .modal-info { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .modal-info-item { text-align:center; padding:14px 8px; background:var(--surface2); border-radius:var(--radius-sm); transition:var(--transition); }
+  .modal-info-item:hover { background:var(--surface3); }
+  .modal-info-item .val { font-size:1.15rem; font-weight:700; }
+  .modal-info-item .lbl { font-size:0.75rem; color:var(--text-dim); margin-top:2px; }
+  .modal-tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; }
+  .modal-footer { padding:18px 24px; border-top:1px solid var(--border); display:flex; gap:12px; justify-content:flex-end; }
+
+  /* ========== Toast ========== */
+  .toast {
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%);
+    background:var(--toast-bg); color:var(--text);
+    padding:14px 28px; border-radius:var(--radius); border:1px solid var(--border);
+    font-size:0.85rem; z-index:300; font-weight:500;
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+    animation:toastIn 0.35s ease; backdrop-filter:blur(12px);
+  }
+  @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(16px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+  /* ========== Footer ========== */
+  .footer { border-top:1px solid var(--border); padding:44px 24px; text-align:center; color:var(--text-dim); font-size:0.84rem; transition:border-color var(--transition); }
+  .footer a { color:var(--accent); text-decoration:none; cursor:pointer; }
+  .footer a:hover { text-decoration:underline; }
+
+  /* ========== 管理后台 ========== */
+  .admin-login {
+    max-width:400px; margin:100px auto; text-align:center;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:40px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.1);
+    animation:slideUp 0.5s ease-out;
+  }
+  .admin-login h2 { font-size:1.3rem; margin-bottom:24px; }
+  .admin-login .form-group { margin-bottom:16px; text-align:left; }
+  .admin-login input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+  .admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:32px; }
+  .admin-stat-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:22px; text-align:center; transition:var(--transition);
+    position:relative; overflow:hidden;
+  }
+  .admin-stat-card::before {
+    content:''; position:absolute; top:0; left:0; width:100%; height:4px;
+    background:linear-gradient(90deg, var(--accent), #6c5ce7);
+    opacity:0; transition:opacity 0.3s ease;
+  }
+  .admin-stat-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:0 12px 30px rgba(108,92,231,0.15); }
+  .admin-stat-card:hover::before { opacity:1; }
+  .admin-stat-card .stat-num { font-size:2rem; font-weight:800; color:var(--accent); }
+  .admin-stat-card .stat-lbl { font-size:0.8rem; color:var(--text-dim); margin-top:4px; }
+  .admin-table-wrap { overflow-x:auto; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); }
+  .admin-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .admin-table th, .admin-table td { padding:12px 16px; text-align:left; border-bottom:1px solid var(--border); }
+  .admin-table th { background:var(--surface2); font-weight:700; color:var(--text2); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; position:sticky; top:0; }
+  .admin-table tr:hover td { background:var(--surface2); }
+  .admin-table .badge-cell { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.72rem; font-weight:700; }
+  .admin-table .badge-free { background:rgba(0,184,148,0.15); color:var(--success); }
+  .admin-table .badge-pro { background:rgba(253,121,168,0.15); color:#fd79a8; }
+  .admin-table .badge-pending { background:rgba(108,92,231,0.15); color:var(--accent); }
+  .admin-table .badge-approved { background:rgba(0,184,148,0.15); color:var(--success); }
+  .admin-table .actions { display:flex; gap:6px; }
+  .admin-table .btn-icon {
+    width:30px; height:30px; border-radius:6px; border:1px solid var(--border);
+    background:var(--surface2); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:0.8rem; transition:var(--transition);
+  }
+  .admin-table .btn-icon:hover { border-color:var(--accent); background:var(--surface3); }
+  .admin-tabs { display:flex; gap:0; margin-bottom:24px; border-bottom:2px solid var(--border); }
+  .admin-tab {
+    padding:10px 24px; cursor:pointer; font-size:0.9rem; font-weight:600;
+    color:var(--text-dim); border-bottom:2px solid transparent; margin-bottom:-2px;
+    transition:var(--transition);
+  }
+  .admin-tab:hover { color:var(--text); }
+  .admin-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .admin-header h1 { font-size:1.6rem; font-weight:800; }
+  .admin-section-title { font-size:1.1rem; font-weight:700; margin:28px 0 16px; display:flex; align-items:center; gap:8px; }
+
+  .modal-edit { max-width:520px; }
+  .modal-edit .form-group { margin-bottom:14px; }
+  .modal-edit .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  /* ========== 动画 Keyframes ========== */
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; }
+    to { opacity:1; }
+  }
+  @keyframes countUp {
+    from { opacity:0; transform:scale(0.6); }
+    to { opacity:1; transform:scale(1); }
+  }
+  @keyframes shimmer {
+    0% { background-position:-200% 0; }
+    100% { background-position:200% 0; }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow:0 0 0 0 rgba(108,92,231,0.3); }
+    50% { box-shadow:0 0 0 8px rgba(108,92,231,0); }
+  }
+
+  /* ========== 页面过渡 ========== */
+  .page-container { animation:slideUp 0.35s ease-out; }
+  .stat-num-animated { animation:countUp 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+
+  /* ========== 快捷键提示 ========== */
+  .shortcuts-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10000;
+    display:flex; align-items:center; justify-content:center;
+    animation:fadeIn 0.2s ease;
+  }
+  .shortcuts-panel {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-lg); padding:32px; max-width:400px; width:90%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  }
+  .shortcuts-panel h2 { font-size:1.2rem; margin-bottom:20px; }
+  .shortcuts-panel .kbd-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); }
+  .shortcuts-panel .kbd-row:last-child { border:none; }
+  .shortcuts-panel kbd {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:4px; padding:2px 8px; font-size:0.75rem; font-family:monospace;
+    color:var(--accent);
+  }
+
+  /* ========== 管理后台搜索栏 ========== */
+  .admin-search { margin-bottom:16px; display:flex; gap:10px; align-items:center; }
+  .admin-search input {
+    flex:1; padding:10px 14px; background:var(--input-bg); border:1.5px solid var(--border);
+    border-radius:var(--radius-sm); color:var(--text); font-size:0.88rem; outline:none;
+    transition:border-color 0.2s;
+  }
+  .admin-search input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,92,231,0.1); }
+  .admin-batch-bar {
+    display:flex; gap:8px; padding:10px 16px; background:var(--surface2);
+    border:1px solid var(--border); border-radius:var(--radius); margin-bottom:16px;
+    align-items:center; justify-content:space-between; flex-wrap:wrap;
+    animation:slideUp 0.3s ease-out;
+  }
+  .admin-batch-bar span { font-size:0.82rem; color:var(--text-dim); }
+
+  /* ========== Toast 增强 ========== */
+  .toast { animation:slideUp 0.3s ease-out, fadeIn 0.3s ease-out; }
+  .toast.hiding { animation:fadeIn 0.3s ease reverse forwards; }
+
+  /* ========== 响应式 ========== */
+  @media (max-width:768px) {
+    .hero { padding:60px 16px 40px; }
+    .hero h1 { font-size:1.5rem; }
+    .hero p { font-size:0.95rem; }
+    .hero-stats { gap:24px; }
+    .hero-stat .num { font-size:1.5rem; }
+    .grid { grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+    .toolbar { flex-direction:column; padding:0 16px 20px; }
+    .nav-links { display:none; }
+    .navbar { padding:0 16px; }
+    .modal { width:96%; border-radius:var(--radius); }
+    .modal-preview .preview-placeholder { height:240px; }
+    .modal-info { grid-template-columns:repeat(2,1fr); }
+    .detail-hero { flex-direction:column; padding:30px 0 20px; }
+    .detail-preview { flex:0 0 auto; width:100%; min-height:240px; }
+    .detail-specs { grid-template-columns:repeat(2,1fr); }
+    .form-row { grid-template-columns:1fr; }
+    .about-hero { padding:50px 16px 30px; }
+    .about-hero h1 { font-size:1.6rem; }
+  }
+  @media (max-width:480px) {
+    .grid { grid-template-columns:1fr; }
+    .hero h1 { font-size:1.35rem; }
+    .card-thumb { height:160px; }
+    .detail-specs { grid-template-columns:repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-logo" onclick="navigate('/')">PixelStock</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#/" data-route="/">素材库</a></li>
+    <li><a href="#/about" data-route="/about">关于</a></li>
+    <li><a href="#/upload" data-route="/upload">上传素材</a></li>
+    <li><a href="#/admin" data-route="/admin" id="adminLink" style="display:none">管理后台</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+      <span class="icon-sun">☀️</span>
+      <span class="icon-moon">🌙</span>
+    </button>
+  </div>
+</nav>
+
+<!-- 主内容区 -->
+<main id="app"></main>
+
+<!-- Preview Modal（首页用） -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="modal-preview" id="modalPreview"></div>
+      <div class="modal-info" id="modalInfo"></div>
+      <div class="modal-tags" id="modalTags"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+      <button class="btn btn-outline btn-sm" id="modalDetailBtn">查看详情</button>
+      <button class="btn btn-download" id="modalDownloadBtn">下载素材</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>PixelStock &copy; 2026 — 高清视频素材库 | <a onclick="navigate('/about')">关于我们</a> · <a>使用条款</a> · <a onclick="navigate('/admin')" style="opacity:0.5;">管理后台</a></p>
+</footer>
+
+<script>
+// ====== 数据 ======
+const ASSETS = [
+  { id:1,  title:'无人机航拍海岸线', cat:'自然风光', res:'4K', dur:'0:45', size:'320MB', fps:60, format:'MP4', badge:'free',   desc:'壮丽的无人机航拍海岸线日落素材，适合旅行视频、纪录片、MV背景。' },
+  { id:2,  title:'城市夜景延时',   cat:'城市建筑', res:'8K', dur:'1:20', size:'680MB', fps:30, format:'MOV', badge:'pro',    desc:'繁华都市夜幕降临延时摄影，霓虹灯闪烁，车流如织，极具视觉冲击力。' },
+  { id:3,  title:'粒子爆炸特效',   cat:'科技特效', res:'4K', dur:'0:12', size:'85MB',  fps:60, format:'MOV', badge:'free',   desc:'高质量粒子爆炸特效素材，Alpha通道，可直接叠加到视频中使用。' },
+  { id:4,  title:'森林阳光穿叶',   cat:'自然风光', res:'4K', dur:'0:30', size:'210MB', fps:24, format:'MP4', badge:'free',   desc:'清晨阳光透过树林的光影素材，温馨治愈，适合Vlog和抒情类视频。' },
+  { id:5,  title:'科技HUD界面动画', cat:'科技特效', res:'4K', dur:'0:25', size:'180MB', fps:30, format:'MP4', badge:'pro',    desc:'赛博朋克风格HUD界面动画，适合科技类视频开场或转场。' },
+  { id:6,  title:'海浪拍打礁石',   cat:'自然风光', res:'4K', dur:'0:38', size:'260MB', fps:60, format:'MP4', badge:'free',   desc:'慢动作海浪拍打礁石素材，水花四溅，极具力量感。' },
+  { id:7,  title:'商务办公楼外景', cat:'城市建筑', res:'4K', dur:'0:50', size:'340MB', fps:24, format:'MP4', badge:'free',   desc:'现代化商务办公楼外景航拍，适合企业宣传片和商务类视频。' },
+  { id:8,  title:'数字数据流动',   cat:'科技特效', res:'8K', dur:'0:18', size:'150MB', fps:30, format:'MOV', badge:'pro',    desc:'二进制数字矩阵流动特效，Matrix风格，适合科技感视频。' },
+  { id:9,  title:'山间云雾缭绕',   cat:'自然风光', res:'8K', dur:'1:05', size:'550MB', fps:24, format:'MP4', badge:'free',   desc:'高山云海延时素材，云雾在山间翻涌，气势磅礴。' },
+  { id:10, title:'霓虹街道慢镜头', cat:'城市建筑', res:'4K', dur:'0:42', size:'290MB', fps:60, format:'MP4', badge:'free',   desc:'雨天霓虹街道慢动作拍摄，灯光倒影，充满电影感。' },
+  { id:11, title:'火焰燃烧转场',   cat:'特效转场', res:'4K', dur:'0:08', size:'45MB',  fps:60, format:'MOV', badge:'free',   desc:'火焰燃烧转场素材，Alpha通道，适合动作类视频过渡。' },
+  { id:12, title:'星空银河延时',   cat:'自然风光', res:'8K', dur:'1:30', size:'780MB', fps:24, format:'MP4', badge:'pro',    desc:'璀璨星空银河延时摄影，斗转星移，震撼人心。' },
+];
+
+const cats = ['全部', ...new Set(ASSETS.map(a=>a.cat))];
+let activeCat = '全部';
+let currentAsset = null;
+
+// ====== 主题 ======
+function toggleTheme() {
+  const html=document.documentElement, cur=html.getAttribute('data-theme');
+  html.setAttribute('data-theme', cur==='dark'?'light':'dark');
+  localStorage.setItem('pixelstock-theme', cur==='dark'?'light':'dark');
+}
+(function(){ const s=localStorage.getItem('pixelstock-theme'); if(s) document.documentElement.setAttribute('data-theme',s); })();
+
+// ====== 工具函数 ======
+function thumbBg(id) {
+  const c=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#0f3460,#16213e)','linear-gradient(135deg,#2d1b69,#1a1a2e)','linear-gradient(135deg,#1b4332,#081c15)','linear-gradient(135deg,#3c096c,#240046)','linear-gradient(135deg,#023e8a,#03045e)','linear-gradient(135deg,#4a0e4e,#1b1a2e)','linear-gradient(135deg,#0b525b,#0a1c2a)'];
+  return c[id%c.length];
+}
+function showToast(msg) {
+  const e=document.querySelector('.toast'); if(e)e.remove();
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(10px)';t.style.transition='all 0.3s ease';setTimeout(()=>t.remove(),300);},2200);
+}
+
+// ====== 弹窗 ======
+function openPreview(id) {
+  currentAsset=ASSETS.find(a=>a.id===id); if(!currentAsset) return;
+  document.getElementById('modalTitle').textContent=currentAsset.title;
+  document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.dur}</span></div>`;
+  document.getElementById('modalInfo').innerHTML=['分辨率','帧率','文件大小','时长','格式','授权'].map((l,i)=>`<div class="modal-info-item"><div class="val">${[currentAsset.res,currentAsset.fps+'fps',currentAsset.size,currentAsset.dur,currentAsset.format,currentAsset.badge==='free'?'免费':'PRO'][i]}</div><div class="lbl">${l}</div></div>`).join('');
+  document.getElementById('modalTags').innerHTML=`<span class="tag active">${currentAsset.cat}</span><span class="tag">${currentAsset.res}</span><span class="tag">${currentAsset.format}</span>`;
+  document.getElementById('modalDownloadBtn').onclick=()=>{downloadAsset(currentAsset.id);};
+  document.getElementById('modalDetailBtn').onclick=()=>{closeModal();navigate('/detail/'+currentAsset.id);};
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e) { if(e&&e.target!==document.getElementById('modalOverlay'))return; document.getElementById('modalOverlay').classList.add('hidden'); document.body.style.overflow=''; currentAsset=null; }
+function downloadAsset(id){ const a=ASSETS.find(x=>x.id===id); if(!a)return; showToast(`正在准备下载「${a.title}」(${a.size})...`); setTimeout(()=>showToast(`「${a.title}」下载完成！`),1500); }
+
+// ====== 首页 ======
+function filterAssets() {
+  const q=(document.getElementById('searchInput')||{}).value||'';
+  return ASSETS.filter(a=>{
+    const mc=activeCat==='全部'||a.cat===activeCat;
+    const ms=!q||a.title.toLowerCase().includes(q.toLowerCase())||a.cat.includes(q)||a.desc.includes(q);
+    return mc&&ms;
+  });
+}
+
+function renderHome() {
+  const app=document.getElementById('app');
+  app.innerHTML=`
+    <section class="hero"><h1>高质量<span>视频素材</span>一站下载</h1><p>精选 4K / 8K 高清素材，覆盖自然风光、城市夜景、科技特效等多种场景，助你快速产出专业级视频。</p><div class="hero-stats"><div class="hero-stat"><div class="num">200+</div><div class="label">高清素材</div></div><div class="hero-stat"><div class="num">4K / 8K</div><div class="label">最高分辨率</div></div><div class="hero-stat"><div class="num">免费</div><div class="label">个人 &amp; 商用</div></div></div></section>
+    <div class="toolbar"><div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索素材关键词..." oninput="renderGrid()"></div><div class="filter-tags" id="filterTags">${cats.map(c=>`<span class="tag${c===activeCat?' active':''}" onclick="setCategory('${c}')">${c}</span>`).join('')}</div></div>
+    <div class="page-container"><div class="grid" id="assetGrid"></div></div>
+  `;
+  renderGrid();
+}
+
+function renderGrid() {
+  const assets=filterAssets(), grid=document.getElementById('assetGrid');
+  if(!grid) return;
+  if(!assets.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">🔍</div><p>未找到匹配的素材</p></div>`;return;}
+  grid.innerHTML=assets.map((a,i)=>`
+    <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="openPreview(${a.id})">
+      <div class="card-thumb" style="background:${thumbBg(a.id)};"><div class="thumb-inner"><span class="thumb-icon">🎬</span></div><span class="card-badge ${a.badge}">${a.badge==='free'?'免费':'PRO'}</span></div>
+      <div class="card-body"><div class="card-title">${a.title}</div><div class="card-meta"><span>📐 ${a.res}</span><span>⏱ ${a.dur}</span><span>📦 ${a.size}</span><span>🎯 ${a.fps}fps</span></div>
+      <div class="card-actions"><button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset(${a.id})">下载</button><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button></div></div></div>
+  `).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.card.reveal').forEach(el=>el.classList.add('visible')));
+}
+function setCategory(cat){activeCat=cat;renderHome();}
+
+// ====== 详情页 ======
+function renderDetail(id) {
+  const a=ASSETS.find(x=>x.id===id);
+  if(!a){navigate('/');return;}
+  const app=document.getElementById('app');
+  app.innerHTML=`
+    <div class="page-container detail-hero">
+      <div class="detail-preview" style="background:${thumbBg(a.id)};min-height:360px;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;"><span style="font-size:6rem;opacity:0.5;">🎬</span><div style="color:var(--text-dim);margin-top:8px;">${a.res} / ${a.format}</div></div></div>
+      <div class="detail-info">
+        <a class="back-link" onclick="navigate('/')">← 返回素材库</a>
+        <h1>${a.title}</h1>
+        <p class="detail-desc">${a.desc}</p>
+        <div class="detail-specs">
+          <div class="detail-spec"><div class="spec-val">${a.res}</div><div class="spec-lbl">分辨率</div></div>
+          <div class="detail-spec"><div class="spec-val">${a.fps}fps</div><div class="spec-lbl">帧率</div></div>
+          <div class="detail-spec"><div class="spec-val">${a.size}</div><div class="spec-lbl">文件大小</div></div>
+          <div class="detail-spec"><div class="spec-val">${a.dur}</div><div class="spec-lbl">时长</div></div>
+          <div class="detail-spec"><div class="spec-val">${a.format}</div><div class="spec-lbl">格式</div></div>
+          <div class="detail-spec"><div class="spec-val">${a.badge==='free'?'免费':'PRO'}</div><div class="spec-lbl">授权类型</div></div>
+        </div>
+        <div class="filter-tags" style="margin-bottom:24px;"><span class="tag active">${a.cat}</span><span class="tag">${a.res}</span><span class="tag">${a.format}</span></div>
+        <div class="detail-actions">
+          <button class="btn btn-download btn-lg" onclick="downloadAsset(${a.id})">⬇ 下载素材 (${a.size})</button>
+          <button class="btn btn-outline btn-lg" onclick="navigate('/')">返回列表</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ====== 关于页 ======
+function renderAbout() {
+  document.getElementById('app').innerHTML=`
+    <div class="about-hero"><h1>关于 PixelStock</h1><p class="subtitle">为创作者而生，让每一帧都出彩</p></div>
+    <div class="page-container">
+      <div class="about-grid">
+        <div class="about-card reveal"><div class="icon">🎯</div><h3>我们的使命</h3><p>降低视频创作门槛，让每一位创作者都能轻松获取高质量素材，专注于创意本身。</p></div>
+        <div class="about-card reveal"><div class="icon">✨</div><h3>品质承诺</h3><p>所有素材均经过人工筛选，确保 4K 及以上分辨率，覆盖多种创作场景。</p></div>
+        <div class="about-card reveal"><div class="icon">🔓</div><h3>开放共享</h3><p>大部分素材免费可商用，部分 PRO 素材以极低价格提供，支持创作者生态。</p></div>
+      </div>
+      <div class="about-team"><h2>核心团队</h2><div class="team-grid">
+        <div class="team-card reveal"><div class="team-avatar">C</div><h4>Curator</h4><p class="role">素材甄选</p></div>
+        <div class="team-card reveal" style="transition-delay:0.1s"><div class="team-avatar">D</div><h4>Designer</h4><p class="role">视觉设计</p></div>
+        <div class="team-card reveal" style="transition-delay:0.2s"><div class="team-avatar">E</div><h4>Engineer</h4><p class="role">技术开发</p></div>
+      </div></div>
+    </div>
+  `;
+  requestAnimationFrame(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible')));
+}
+
+// ====== 上传页 ======
+function renderUpload() {
+  document.getElementById('app').innerHTML=`
+    <div class="page-container upload-page">
+      <h1>📤 上传素材</h1>
+      <p class="upload-sub">分享你的高质量视频素材，审核通过后将展示在素材库中</p>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📁</div>
+        <h3>点击或拖拽文件到此处</h3>
+        <p>支持 MP4, MOV, AVI 格式，单文件最大 2GB</p>
+      </div>
+      <input type="file" id="fileInput" multiple accept="video/*" style="display:none" onchange="handleUploadFiles(this.files)">
+      <div class="upload-preview-grid" id="uploadPreview"></div>
+      <div class="upload-form" style="margin-top:24px;">
+        <div class="form-group"><label>素材标题 *</label><input type="text" id="uploadTitle" placeholder="输入素材标题"></div>
+        <div class="form-row">
+          <div class="form-group"><label>分类 *</label><select id="uploadCat"><option value="">选择分类</option>${cats.filter(c=>c!=='全部').map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div class="form-group"><label>分辨率</label><select id="uploadRes"><option>4K</option><option>8K</option><option>1080p</option><option>2K</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>帧率 (fps)</label><input type="number" id="uploadFps" placeholder="如 24, 30, 60" min="1" max="120"></div>
+          <div class="form-group"><label>授权类型</label><select id="uploadLicense"><option value="free">免费</option><option value="pro">PRO</option></select></div>
+        </div>
+        <div class="form-group"><label>素材描述</label><textarea id="uploadDesc" rows="3" placeholder="描述素材内容、拍摄手法、适用场景..."></textarea></div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button class="btn btn-primary btn-lg" onclick="submitUpload()">提交上传</button>
+          <button class="btn btn-outline btn-lg" onclick="resetUpload()">重置</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 拖拽上传
+  const zone=document.getElementById('uploadZone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');handleUploadFiles(e.dataTransfer.files);});
+}
+
+let uploadedFiles=[];
+function handleUploadFiles(files) {
+  uploadedFiles=Array.from(files).slice(0,5);
+  const preview=document.getElementById('uploadPreview');
+  if(!preview) return;
+  preview.innerHTML=uploadedFiles.map((f,i)=>`
+    <div class="upload-preview-item">
+      <div class="file-icon">🎬</div>
+      <div class="file-name">${f.name.substring(0,20)}${f.name.length>20?'...':''}</div>
+      <div class="file-size">${(f.size/1024/1024).toFixed(1)} MB</div>
+      <button class="btn btn-outline btn-sm" style="margin-top:8px;font-size:0.7rem;" onclick="removeUploadFile(${i})">移除</button>
+    </div>
+  `).join('');
+}
+function removeUploadFile(i){uploadedFiles.splice(i,1);handleUploadFiles({length:0,...uploadedFiles});}
+function resetUpload(){uploadedFiles=[];renderUpload();}
+function submitUpload() {
+  const title=document.getElementById('uploadTitle')?.value, cat=document.getElementById('uploadCat')?.value;
+  if(!title){showToast('请输入素材标题');return;}
+  if(!cat){showToast('请选择分类');return;}
+  if(!uploadedFiles.length){showToast('请选择至少一个视频文件');return;}
+  const newId=ASSETS.length+1;
+  const res=document.getElementById('uploadRes')?.value||'4K';
+  const fps=parseInt(document.getElementById('uploadFps')?.value)||30;
+  const license=document.getElementById('uploadLicense')?.value||'free';
+  const desc=document.getElementById('uploadDesc')?.value||'用户上传素材';
+  ASSETS.push({id:newId,title,cat,res,dur:'未知',size:'未知',fps,format:'MP4',badge:license,desc,status:'pending'});
+  showToast(`素材「${title}」已提交审核！`);
+  setTimeout(()=>navigate('/'),800);
+}
+
+// ====== 管理后台 ======
+const ADMIN_PASSWORD = 'admin123';
+let adminAuthed = false;
+let adminTab = 'dashboard'; // dashboard | assets | review
+
+function getPendingAssets() { return ASSETS.filter(a => a.status === 'pending'); }
+function getApprovedAssets() { return ASSETS.filter(a => !a.status || a.status === 'approved'); }
+function adminStats() {
+  return {
+    total: ASSETS.length,
+    free: ASSETS.filter(a=>a.badge==='free').length,
+    pro: ASSETS.filter(a=>a.badge==='pro').length,
+    pending: getPendingAssets().length,
+    categories: [...new Set(ASSETS.map(a=>a.cat))].length
+  };
+}
+
+function renderAdminLogin() {
+  document.getElementById('app').innerHTML = `
+    <div class="admin-login">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🔐</div>
+      <h2>管理员登录</h2>
+      <div class="form-group"><label>管理密码</label><input type="password" id="adminPwd" placeholder="输入管理密码" style="width:100%;padding:11px 14px;background:var(--input-bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;"></div>
+      <button class="btn btn-primary btn-lg" onclick="adminLogin()" style="width:100%;margin-top:8px;">登录后台</button>
+      <p style="color:var(--text-dim);font-size:0.75rem;margin-top:14px;">默认密码: admin123</p>
+    </div>
+  `;
+}
+
+function adminLogin() {
+  const pwd = document.getElementById('adminPwd')?.value;
+  if (pwd === ADMIN_PASSWORD) {
+    adminAuthed = true;
+    document.getElementById('adminLink').style.display = '';
+    renderAdmin();
+  } else {
+    showToast('密码错误，请重试');
+  }
+}
+
+function adminLogout() {
+  adminAuthed = false;
+  document.getElementById('adminLink').style.display = 'none';
+  navigate('/');
+  showToast('已退出管理后台');
+}
+
+function renderAdmin() {
+  if (!adminAuthed) { renderAdminLogin(); return; }
+  document.getElementById('adminLink').style.display = '';
+  const app = document.getElementById('app');
+  const stats = adminStats();
+
+  app.innerHTML = `
+    <div class="page-container" style="padding-top:32px;">
+      <div class="admin-header">
+        <h1>📊 管理后台</h1>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="adminExportCSV()" title="导出数据 (Ctrl+E)">📥 导出 CSV</button>
+          <button class="btn btn-outline btn-sm" onclick="adminLogout()">退出登录</button>
+        </div>
+      </div>
+
+      <div class="admin-stats">
+        <div class="admin-stat-card"><div class="stat-num stat-num-animated">${stats.total}</div><div class="stat-lbl">素材总数</div></div>
+        <div class="admin-stat-card"><div class="stat-num stat-num-animated">${stats.free}</div><div class="stat-lbl">免费素材</div></div>
+        <div class="admin-stat-card"><div class="stat-num stat-num-animated">${stats.pro}</div><div class="stat-lbl">PRO 素材</div></div>
+        <div class="admin-stat-card"><div class="stat-num stat-num-animated">${stats.pending}</div><div class="stat-lbl">待审核</div></div>
+        <div class="admin-stat-card"><div class="stat-num stat-num-animated">${stats.categories}</div><div class="stat-lbl">分类数量</div></div>
+      </div>
+
+      <div class="admin-tabs">
+        <div class="admin-tab${adminTab==='dashboard'?' active':''}" onclick="adminTab='dashboard';renderAdmin();">📈 数据看板</div>
+        <div class="admin-tab${adminTab==='assets'?' active':''}" onclick="adminTab='assets';renderAdmin();">📋 素材管理</div>
+        <div class="admin-tab${adminTab==='review'?' active':''}" onclick="adminTab='review';renderAdmin();">⏳ 审核队列 ${stats.pending?`<span style="background:var(--accent);color:#fff;border-radius:10px;padding:1px 8px;font-size:0.7rem;margin-left:6px;">${stats.pending}</span>`:''}</div>
+      </div>
+
+      ${adminTab==='dashboard' ? renderAdminDashboard(stats) : ''}
+      ${adminTab==='assets' ? renderAdminAssets() : ''}
+      ${adminTab==='review' ? renderAdminReview() : ''}
+    </div>
+  `;
+}
+
+function renderAdminDashboard(stats) {
+  const approved = getApprovedAssets();
+  const byCat = {};
+  approved.forEach(a => { byCat[a.cat] = (byCat[a.cat]||0)+1; });
+  const maxCat = Math.max(...Object.values(byCat), 1);
+  return `
+    <div class="admin-section-title">📊 分类分布</div>
+    <div style="display:grid;gap:8px;margin-bottom:24px;">
+      ${Object.entries(byCat).map(([cat,count]) => `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="width:80px;font-size:0.82rem;color:var(--text);">${cat}</span>
+          <div style="flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${(count/maxCat*100).toFixed(0)}%;background:var(--accent);border-radius:4px;transition:width 0.5s ease;"></div>
+          </div>
+          <span style="font-size:0.8rem;color:var(--text-dim);min-width:24px;text-align:right;">${count}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="admin-section-title">🕐 最近素材</div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>标题</th><th>分类</th><th>分辨率</th><th>授权</th><th>状态</th></tr></thead>
+        <tbody>${ASSETS.slice(-8).reverse().map(a=>`
+          <tr>
+            <td>#${a.id}</td><td>${a.title}</td><td>${a.cat}</td><td>${a.res}</td>
+            <td><span class="badge-cell ${a.badge==='free'?'badge-free':'badge-pro'}">${a.badge==='free'?'免费':'PRO'}</span></td>
+            <td><span class="badge-cell ${a.status==='pending'?'badge-pending':'badge-approved'}">${a.status==='pending'?'待审核':'已发布'}</span></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAdminAssets() {
+  const all = [...ASSETS].reverse();
+  return `
+    <div class="admin-search">
+      <input type="text" id="adminSearchInput" placeholder="搜索素材标题或分类..." oninput="adminFilterTable()">
+      <span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap;">共 ${all.length} 项</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <button class="btn btn-outline btn-sm" onclick="adminSelectAll()" style="margin-right:8px;">全选</button>
+      <button class="btn btn-danger btn-sm" onclick="adminBatchDelete()" id="adminBatchDeleteBtn" disabled>批量删除</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:8px;" onclick="adminAddAsset()">+ 新增素材</button>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="adminAssetTable">
+        <thead><tr><th style="width:40px;"><input type="checkbox" id="adminSelectAllCheck" onchange="adminToggleAll(this)" title="全选"></th><th>ID</th><th>标题</th><th>分类</th><th>分辨率</th><th>大小</th><th>授权</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>${all.map(a=>`
+          <tr data-asset-id="${a.id}" data-search="${a.title} ${a.cat}">
+            <td><input type="checkbox" class="admin-asset-check" onchange="adminUpdateBatchBtn()"></td>
+            <td>#${a.id}</td><td>${a.title}</td><td>${a.cat}</td><td>${a.res}</td><td>${a.size}</td>
+            <td><span class="badge-cell ${a.badge==='free'?'badge-free':'badge-pro'}">${a.badge==='free'?'免费':'PRO'}</span></td>
+            <td><span class="badge-cell ${a.status==='pending'?'badge-pending':'badge-approved'}">${a.status==='pending'?'待审核':'已发布'}</span></td>
+            <td><div class="actions">
+              <button class="btn-icon" onclick="adminEditAsset(${a.id})" title="编辑">✏️</button>
+              <button class="btn-icon" onclick="adminDeleteAsset(${a.id})" title="删除" style="border-color:rgba(255,118,117,0.3);">🗑️</button>
+            </div></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function adminFilterTable() {
+  const q = (document.getElementById('adminSearchInput')?.value || '').toLowerCase();
+  document.querySelectorAll('#adminAssetTable tbody tr').forEach(tr => {
+    tr.style.display = (tr.dataset.search || '').toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function adminToggleAll(cb) {
+  document.querySelectorAll('.admin-asset-check').forEach(c => { c.checked = cb.checked; });
+  adminUpdateBatchBtn();
+}
+function adminSelectAll() {
+  const checks = document.querySelectorAll('.admin-asset-check');
+  const allChecked = Array.from(checks).every(c => c.checked);
+  document.getElementById('adminSelectAllCheck').checked = !allChecked;
+  checks.forEach(c => { c.checked = !allChecked; });
+  adminUpdateBatchBtn();
+}
+function adminUpdateBatchBtn() {
+  const count = document.querySelectorAll('.admin-asset-check:checked').length;
+  const btn = document.getElementById('adminBatchDeleteBtn');
+  if (btn) { btn.disabled = count === 0; btn.textContent = `批量删除${count?' ('+count+')':''}`; }
+}
+function adminBatchDelete() {
+  const selected = Array.from(document.querySelectorAll('.admin-asset-check:checked'))
+    .map(c => parseInt(c.closest('tr').dataset.assetId));
+  if (!selected.length) return;
+  showAdminModal(`
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:3rem;margin-bottom:12px;">⚠️</div>
+      <h2 style="margin-bottom:12px;">确认批量删除</h2>
+      <p style="color:var(--danger);font-size:0.9rem;">将删除选中的 ${selected.length} 个素材，此操作不可恢复</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">
+        <button class="btn btn-outline" onclick="closeAdminModal()">取消</button>
+        <button class="btn btn-danger" onclick="adminConfirmBatchDelete([${selected}])">确认删除 ${selected.length} 项</button>
+      </div>
+    </div>
+  `);
+}
+function adminConfirmBatchDelete(ids) {
+  ids.forEach(id => { const idx = ASSETS.findIndex(x => x.id === id); if (idx >= 0) ASSETS.splice(idx, 1); });
+  closeAdminModal();
+  showToast(`${ids.length} 个素材已删除`);
+  renderAdmin();
+}
+
+function renderAdminReview() {
+  const pending = getPendingAssets();
+  if (!pending.length) {
+    return `<div style="text-align:center;padding:60px 0;color:var(--text-dim);"><div style="font-size:3rem;margin-bottom:12px;">✅</div><p>暂无待审核素材</p></div>`;
+  }
+  return `
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>标题</th><th>分类</th><th>分辨率</th><th>提交时间</th><th>操作</th></tr></thead>
+        <tbody>${pending.map(a=>`
+          <tr>
+            <td>#${a.id}</td><td>${a.title}</td><td>${a.cat}</td><td>${a.res}</td>
+            <td>${new Date().toLocaleDateString('zh-CN')}</td>
+            <td><div class="actions">
+              <button class="btn-icon" onclick="adminApprove(${a.id})" title="通过审核" style="color:var(--success);">✅</button>
+              <button class="btn-icon" onclick="adminReject(${a.id})" title="拒绝">❌</button>
+            </div></td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function adminApprove(id) {
+  const a = ASSETS.find(x => x.id === id);
+  if (a) { a.status = 'approved'; showToast(`「${a.title}」审核通过`); renderAdmin(); }
+}
+function adminReject(id) {
+  const idx = ASSETS.findIndex(x => x.id === id);
+  if (idx >= 0) {
+    const title = ASSETS[idx].title;
+    ASSETS.splice(idx, 1);
+    showToast(`「${title}」已拒绝并移除`);
+    renderAdmin();
+  }
+}
+function adminEditAsset(id) {
+  const a = ASSETS.find(x => x.id === id);
+  if (!a) return;
+  showAdminModal(`
+    <h2 style="margin-bottom:20px;">✏️ 编辑素材 #${a.id}</h2>
+    <div class="form-group"><label>标题</label><input type="text" id="editTitle" value="${a.title.replace(/"/g,'&quot;')}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>分类</label><select id="editCat">${cats.filter(c=>c!=='全部').map(c=>`<option ${c===a.cat?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>分辨率</label><select id="editRes"><option ${a.res==='4K'?'selected':''}>4K</option><option ${a.res==='8K'?'selected':''}>8K</option><option ${a.res==='1080p'?'selected':''}>1080p</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>帧率</label><input type="number" id="editFps" value="${a.fps}"></div>
+      <div class="form-group"><label>授权</label><select id="editLicense"><option ${a.badge==='free'?'selected':''} value="free">免费</option><option ${a.badge==='pro'?'selected':''} value="pro">PRO</option></select></div>
+    </div>
+    <div class="form-group"><label>描述</label><textarea id="editDesc" rows="2">${a.desc.replace(/"/g,'&quot;')}</textarea></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-outline" onclick="closeAdminModal()">取消</button>
+      <button class="btn btn-primary" onclick="adminSaveEdit(${a.id})">保存修改</button>
+    </div>
+  `);
+}
+function adminSaveEdit(id) {
+  const a = ASSETS.find(x => x.id === id);
+  if (!a) return;
+  a.title = document.getElementById('editTitle')?.value || a.title;
+  a.cat = document.getElementById('editCat')?.value || a.cat;
+  a.res = document.getElementById('editRes')?.value || a.res;
+  a.fps = parseInt(document.getElementById('editFps')?.value) || a.fps;
+  a.badge = document.getElementById('editLicense')?.value || a.badge;
+  a.desc = document.getElementById('editDesc')?.value || a.desc;
+  closeAdminModal();
+  showToast(`素材 #${id} 已更新`);
+  renderAdmin();
+}
+function adminDeleteAsset(id) {
+  const a = ASSETS.find(x => x.id === id);
+  if (!a) return;
+  showAdminModal(`
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:3rem;margin-bottom:12px;">⚠️</div>
+      <h2 style="margin-bottom:12px;">确认删除</h2>
+      <p style="color:var(--text-dim);margin-bottom:8px;">「${a.title}」</p>
+      <p style="color:var(--danger);font-size:0.82rem;">此操作不可恢复</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">
+        <button class="btn btn-outline" onclick="closeAdminModal()">取消</button>
+        <button class="btn btn-danger" onclick="adminConfirmDelete(${id})">确认删除</button>
+      </div>
+    </div>
+  `);
+}
+function adminConfirmDelete(id) {
+  const idx = ASSETS.findIndex(x => x.id === id);
+  if (idx >= 0) { ASSETS.splice(idx, 1); }
+  closeAdminModal();
+  showToast(`素材 #${id} 已删除`);
+  renderAdmin();
+}
+function adminAddAsset() {
+  showAdminModal(`
+    <h2 style="margin-bottom:20px;">➕ 新增素材</h2>
+    <div class="form-group"><label>标题 *</label><input type="text" id="addTitle" placeholder="素材标题"></div>
+    <div class="form-row">
+      <div class="form-group"><label>分类</label><select id="addCat">${cats.filter(c=>c!=='全部').map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>分辨率</label><select id="addRes"><option>4K</option><option>8K</option><option>1080p</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>帧率</label><input type="number" id="addFps" value="30"></div>
+      <div class="form-group"><label>时长</label><input type="text" id="addDur" value="0:30" placeholder="如 0:30"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>文件大小</label><input type="text" id="addSize" value="150MB" placeholder="如 150MB"></div>
+      <div class="form-group"><label>授权</label><select id="addLicense"><option value="free">免费</option><option value="pro">PRO</option></select></div>
+    </div>
+    <div class="form-group"><label>描述</label><textarea id="addDesc" rows="2" placeholder="素材描述..."></textarea></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-outline" onclick="closeAdminModal()">取消</button>
+      <button class="btn btn-primary" onclick="adminConfirmAdd()">确认添加</button>
+    </div>
+  `);
+}
+function adminConfirmAdd() {
+  const title = document.getElementById('addTitle')?.value;
+  if (!title) { showToast('请输入标题'); return; }
+  const newId = Math.max(...ASSETS.map(a=>a.id), 0) + 1;
+  ASSETS.push({
+    id: newId, title,
+    cat: document.getElementById('addCat')?.value || '自然风光',
+    res: document.getElementById('addRes')?.value || '4K',
+    dur: document.getElementById('addDur')?.value || '0:30',
+    size: document.getElementById('addSize')?.value || '150MB',
+    fps: parseInt(document.getElementById('addFps')?.value) || 30,
+    format: 'MP4',
+    badge: document.getElementById('addLicense')?.value || 'free',
+    desc: document.getElementById('addDesc')?.value || '',
+    status: 'approved'
+  });
+  closeAdminModal();
+  showToast(`「${title}」已添加`);
+  renderAdmin();
+}
+
+function adminExportCSV() {
+  const headers = ['ID','标题','分类','分辨率','时长','大小','帧率','格式','授权','状态','描述'];
+  const rows = ASSETS.map(a => [
+    a.id, a.title, a.cat, a.res, a.dur, a.size, a.fps, a.format, a.badge, a.status||'approved', a.desc
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v}"`).join(','))].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `PixelStock_素材库_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${ASSETS.length} 条数据`);
+}
+
+function showShortcuts() {
+  const overlay = document.createElement('div');
+  overlay.className = 'shortcuts-overlay';
+  overlay.onclick = () => overlay.remove();
+  overlay.innerHTML = `
+    <div class="shortcuts-panel" onclick="event.stopPropagation()">
+      <h2>📋 快捷键参考</h2>
+      <div class="kbd-row"><span>全局搜索</span><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
+      <div class="kbd-row"><span>切换主题</span><kbd>Ctrl</kbd> + <kbd>T</kbd></div>
+      <div class="kbd-row"><span>返回首页</span><kbd>Esc</kbd></div>
+      <div class="kbd-row"><span>刷新页面</span><kbd>F5</kbd></div>
+      <div class="kbd-row"><span>管理后台</span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd></div>
+      <div class="kbd-row"><span>导出数据</span><kbd>Ctrl</kbd> + <kbd>E</kbd></div>
+      <div class="kbd-row"><span>显示此面板</span><kbd>?</kbd></div>
+      <div style="margin-top:20px;text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="this.closest('.shortcuts-overlay')?.remove()">关闭</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+function showAdminModal(html) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) closeAdminModal(); };
+  overlay.innerHTML = `<div class="modal modal-edit" onclick="event.stopPropagation()"><div class="modal-body">${html}</div></div>`;
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+}
+
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'k' && !e.target.matches('input,textarea')) {
+      e.preventDefault();
+      const search = document.getElementById('searchInput');
+      if (search) { search.focus(); search.select(); }
+    }
+    if (e.ctrlKey && e.key === 't') { e.preventDefault(); toggleTheme(); }
+    if (e.ctrlKey && e.shiftKey && e.key === 'm') { e.preventDefault(); navigate('/admin'); }
+    if (e.ctrlKey && e.key === 'e' && adminAuthed) { e.preventDefault(); adminExportCSV(); }
+    if (e.key === '?') { e.preventDefault(); showShortcuts(); }
+    if (e.key === 'Escape') {
+      if (document.querySelector('.shortcuts-overlay')) document.querySelector('.shortcuts-overlay').remove();
+      else if (window.location.hash !== '#/') navigate('/');
+    }
+  });
+}
+function closeAdminModal() {
+  const overlay = document.querySelector('.modal-overlay:not(.hidden)');
+  if (overlay) overlay.remove();
+  const hidden = document.getElementById('modalOverlay');
+  if (hidden && !hidden.classList.contains('hidden')) return;
+  document.body.style.overflow = '';
+}
+
+// ====== 路由系统 ======
+function getRoute() { return window.location.hash.slice(1) || '/'; }
+
+function navigate(path) {
+  window.location.hash = '#' + path;
+}
+
+function renderRoute() {
+  const route = getRoute();
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  // 更新导航高亮
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    const r = a.getAttribute('data-route');
+    a.classList.toggle('active', r === '/' ? (route === '/' || route.startsWith('/detail/')) : route === r);
+  });
+
+  // 路由匹配
+  if (route === '/' || route === '') {
+    activeCat = '全部';
+    renderHome();
+  } else if (route.startsWith('/detail/')) {
+    const id = parseInt(route.split('/detail/')[1]);
+    renderDetail(id);
+  } else if (route === '/about') {
+    renderAbout();
+  } else if (route === '/upload') {
+    renderUpload();
+  } else if (route === '/admin') {
+    renderAdmin();
+  } else {
+    navigate('/');
+  }
+}
+
+// ====== 事件 ======
+window.addEventListener('hashchange', renderRoute);
+window.addEventListener('load', renderRoute);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove());
+});
+
+// 初始化快捷键
+initKeyboardShortcuts();
+</script>
+</body>
+</html>
