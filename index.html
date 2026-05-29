@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -114,6 +114,10 @@
   .btn-fav { background:transparent; color:var(--text-dim); border:1px solid var(--border); padding:4px 8px; min-width:0; cursor:pointer; border-radius:6px; transition:0.2s; }
   .btn-fav:hover { background:rgba(255,193,7,0.1); color:#ffc107; border-color:#ffc107; }
   .btn-fav.favorited { background:rgba(255,193,7,0.15); color:#ffc107; border-color:#ffc107; }
+  .btn-fav-card { background:transparent; color:var(--text-dim); border:1px solid var(--border); padding:4px 8px; min-width:0; cursor:pointer; border-radius:6px; transition:0.2s; font-size:0.85rem; }
+  .btn-fav-card:hover { background:rgba(255,193,7,0.1); color:#ffc107; border-color:#ffc107; }
+  .btn-fav-card.favorited { background:rgba(255,193,7,0.15); color:#ffc107; border-color:#ffc107; }
+  .btn-icon { padding:4px 8px; min-width:0; background:transparent; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:0.2s; }
   .fav-icon { font-size:0.9rem; }
 
   .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.3); transform:scale(0); animation:ripple 0.6s ease-out; pointer-events:none; }
@@ -628,6 +632,38 @@
     background:#5a4bd1; transform:translateY(-1px);
     box-shadow:0 4px 20px rgba(99,102,241,0.4);
   }
+/* ====== 回到顶部按钮 ====== */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.55);
+}
 </style>
 </head>
 <body>
@@ -780,7 +816,7 @@ async function fetchPexelsVideos(q, page = 1) {
   } catch (e) {
     console.error('Pexels fetch error:', e);
     if (page === 1) pexelsResults = [];
-    pexelsHasMore = false;
+    if (page === 1) { pexelsResults = []; showToast('⚠️ Pexels API 请求失败，请检查 API Key 或网络连接'); }
     return [];
   } finally { pexelsLoading = false; }
 }
@@ -858,11 +894,47 @@ function thumbBg(id) {
   const c=['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#0f3460,#16213e)','linear-gradient(135deg,#2d1b69,#1a1a2e)','linear-gradient(135deg,#1b4332,#081c15)','linear-gradient(135deg,#3c096c,#240046)','linear-gradient(135deg,#023e8a,#03045e)','linear-gradient(135deg,#4a0e4e,#1b1a2e)','linear-gradient(135deg,#0b525b,#0a1c2a)'];
   return c[id%c.length];
 }
-function showToast(msg) {
+function showToast(msg, link) {
   const e=document.querySelector('.toast'); if(e)e.remove();
-  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  const t=document.createElement('div'); t.className='toast'; t.innerHTML=msg;
   document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(10px)';t.style.transition='all 0.3s ease';setTimeout(()=>t.remove(),300);},2200);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(10px)';t.style.transition='all 0.3s ease';setTimeout(()=>t.remove(),300);},link?3200:2200);
+}
+function renderAssetCard(a,i){
+  const favClass = isFavorited(a.id) ? ' favorited' : '';
+  const actions = [];
+  actions.push('<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();downloadAsset(\''+a.id+'\')" style="flex:1;white-space:nowrap;">下载</button>');
+  if(a.pexels){
+    actions.push('<a class="btn btn-outline btn-sm" href="'+a.pexelsUrl+'" target="_blank" onclick="event.stopPropagation()" style="font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;">Pexels</a>');
+  } else {
+    actions.push('<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate(\'/'+a.cat+'/'+a.id+'\')" style="white-space:nowrap;">详情</button>');
+  }
+  var favText = isFavorited(a.id) ? ' 已收藏' : ' 收藏';
+  actions.push('<button class="btn btn-icon btn-sm fav-btn-card'+favClass+'" onclick="event.stopPropagation();toggleFavorite(\''+a.id+'\',event)" style="display:inline-flex;align-items:center;gap:4px;">'+favIconHtml(a.id)+favText+'</button>');
+  var thumbHTML = '';
+  if(a.thumbnail){
+    thumbHTML = '<img src="'+a.thumbnail+'" style="width:100%;height:100%;object-fit:cover;display:block;" alt="'+a.title+'" loading="lazy">';
+  }
+  var badgeHTML = '';
+  if(a.uploaded){
+    badgeHTML = '<span class="card-badge uploaded">已上传</span>';
+  } else if(a.badge==='pexels'){
+    badgeHTML = '<span class="card-badge pexels">Pexels</span>';
+  } else if(a.badge==='free'){
+    badgeHTML = '<span class="card-badge free">免费</span>';
+  } else {
+    badgeHTML = '<span class="card-badge pro">PRO</span>';
+  }
+  var bgStyle = a.thumbnail ? 'url('+a.thumbnail+') center/cover no-repeat' : 'linear-gradient(135deg,#1a1a2e,#16213e)';
+  var clickHandler = a.pexels ? 'openPexelsPreview(\''+a.id+'\')' : 'openPreview('+a.id+')';
+  return '<div class="card reveal" style="animation-delay:'+(i*0.05)+'s" onclick="'+clickHandler+'">'+
+    '<div class="card-thumb" style="background:'+bgStyle+';">'+thumbHTML+badgeHTML+'</div>'+
+    '<div class="card-body">'+
+    '<div class="card-title">'+a.title+'</div>'+
+    '<div class="card-meta"><span> '+a.res+'</span><span> '+a.dur+'</span><span> '+a.size+'</span><span> '+a.fps+'fps</span></div>'+
+    '<div class="card-actions">'+actions.join('')+'</div>'+
+    (a.pexels?'<div class="pexels-credit">Provided by <a href="'+a.pexelsUrl+'" target="_blank">'+a.pexelsUser+'</a> / Pexels</div>':'')+
+    '</div></div>';
 }
 
 // ====== 弹窗 ======
@@ -1026,23 +1098,7 @@ function renderGrid() {
   if(!assets.length){
     const emptyMsg = pexelsEnabled ? 'Pexels 无搜索结果，换个关键词试试？' : '未找到匹配的素材';
     grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">🔍</div><p>${emptyMsg}</p>${pexelsEnabled&&!PEXELS_KEY?`<p class="pexels-hint">请先在 <a onclick="navigate('/admin')" style="color:var(--accent);cursor:pointer;text-decoration:underline;">管理后台</a> 设置 Pexels API Key</p>`:''}</div>`; return; }
-  grid.innerHTML=assets.map((a,i)=>`
-    <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="${a.pexels?`openPexelsPreview('${a.id}')`:`openPreview(${a.id})`}">
-      <div class="card-thumb" style="background:${a.thumbnail?`url(${a.thumbnail}) center/cover no-repeat`:'linear-gradient(135deg,#1a1a2e,#16213e)'};">
-        ${a.thumbnail?`<img src="${a.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${a.title}" loading="lazy">`:''}
-        <span class="card-badge ${a.uploaded?'uploaded':a.badge}">${a.uploaded?'已上传':a.badge==='pexels'?'Pexels':a.badge==='free'?'免费':'PRO'}</span>
-      </div>
-      <div class="card-body">
-        <div class="card-title">${a.title}</div>
-        <div class="card-meta"><span>📐 ${a.res}</span><span>⏱ ${a.dur}</span><span>📦 ${a.size}</span><span>🎯 ${a.fps}fps</span></div>
-        <div class="card-actions">
-          <button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset('${a.id}')">下载</button>
-          ${a.pexels?`<a class="btn btn-outline btn-sm" href="${a.pexelsUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;">Pexels</a>`:`<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button>`}
-          <button class="btn btn-fav btn-sm fav-btn${isFavorited(a.id)?' favorited':''}" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" title="收藏">${favIconHtml(a.id)}</button>
-        </div>
-        ${a.pexels?`<p class="pexels-credit">by <a href="${a.pexelsUserUrl}" target="_blank">${a.pexelsUser}</a></p>`:''}
-      </div></div>
-  `).join('');
+  grid.innerHTML=assets.map((a,i)=>renderAssetCard(a,i)).join('');
   if (pexelsEnabled && pexelsHasMore && !pexelsLoading) {
     grid.innerHTML += `<div class="load-more-wrap"><button class="load-more-btn" onclick="loadMorePexels()">加载更多 (当前已显示 ${pexelsResults.length} 个)</button></div>`;
   }
@@ -1435,23 +1491,7 @@ function renderFavorites() {
       <h1 style="margin-bottom:8px;">⭐ 我的收藏</h1>
       <p class="upload-sub">共 ${favAssets.length} 个收藏素材</p>
       ${favAssets.length === 0 ? `<div style="text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">📭</div><p>收藏夹空空如也，去素材库逛逛吧！</p><button class="btn btn-primary" onclick="navigate('/')" style="margin-top:16px;">前往素材库</button></div>` : ''}
-      <div class="grid" id="favGrid" style="margin-top:24px;">${favAssets.map((a,i) => `
-        <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="${a.pexels?`openPexelsPreview('${a.id}')`:`openPreview(${a.id})`}">
-          <div class="card-thumb" style="background:${a.thumbnail?`url(${a.thumbnail}) center/cover no-repeat`:'linear-gradient(135deg,#1a1a2e,#16213e)'};">
-            ${a.thumbnail?`<img src="${a.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${a.title}" loading="lazy">`:''}
-            <span class="card-badge ${a.uploaded?'uploaded':a.badge}">${a.uploaded?'已上传':a.badge==='pexels'?'Pexels':a.badge==='free'?'免费':'PRO'}</span>
-          </div>
-          <div class="card-body">
-            <div class="card-title">${a.title}</div>
-            <div class="card-meta"><span>📐 ${a.res||'N/A'}</span><span>⏱ ${a.dur||'N/A'}</span><span>📦 ${a.size||'N/A'}</span><span>🎯 ${a.fps||'N/A'}fps</span></div>
-            <div class="card-actions">
-              <button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset('${a.id}')">下载</button>
-              ${a.pexels?`<a class="btn btn-outline btn-sm" href="${a.pexelsUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;">Pexels</a>`:`<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button>`}
-              <button class="btn btn-fav btn-sm fav-btn favorited" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" title="取消收藏">${favIconHtml(a.id)}</button>
-            </div>
-            ${a.pexels?`<p class="pexels-credit">by <a href="${a.pexelsUserUrl}" target="_blank">${a.pexelsUser}</a></p>`:''}
-          </div>
-        </div>`).join('')}
+      <div class="grid" id="favGrid" style="margin-top:24px;">${favAssets.map((a,i)=>renderAssetCard(a,i)).join('')}</div>
       </div>
     </div>
   `;
@@ -2246,6 +2286,26 @@ document.addEventListener('click', function(e) {
 initKeyboardShortcuts();
 // 初始化用户菜单
 renderUserMenu();
+</script>
+<button class="back-to-top" id="backToTopBtn" aria-label="回到顶部" title="回到顶部">↑</button>
+<script>
+(function(){
+  const btn = document.getElementById('backToTopBtn');
+  if (!btn) return;
+  let scrollTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        btn.classList.toggle('visible', window.scrollY > 400);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
 </script>
 </body>
 </html>
