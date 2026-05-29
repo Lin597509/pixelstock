@@ -111,6 +111,10 @@
   .btn-download:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,184,148,0.35); }
   .btn-lg { padding:12px 32px; font-size:1rem; }
   .btn-danger { background:var(--danger); color:#fff; }
+  .btn-fav { background:transparent; color:var(--text-dim); border:1px solid var(--border); padding:4px 8px; min-width:0; cursor:pointer; border-radius:6px; transition:0.2s; }
+  .btn-fav:hover { background:rgba(255,193,7,0.1); color:#ffc107; border-color:#ffc107; }
+  .btn-fav.favorited { background:rgba(255,193,7,0.15); color:#ffc107; border-color:#ffc107; }
+  .fav-icon { font-size:0.9rem; }
 
   .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.3); transform:scale(0); animation:ripple 0.6s ease-out; pointer-events:none; }
   @keyframes ripple { to { transform:scale(4); opacity:0; } }
@@ -444,6 +448,40 @@
   .toast { animation:slideUp 0.3s ease-out, fadeIn 0.3s ease-out; }
   .toast.hiding { animation:fadeIn 0.3s ease reverse forwards; }
 
+  /* ========== 用户系统 ========== */
+  .user-modal { max-width:420px; }
+  .user-modal .form-group { margin-bottom:14px; }
+  .user-menu {
+    position:relative; display:inline-block;
+  }
+  .user-btn {
+    display:flex; align-items:center; gap:8px; padding:6px 14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); cursor:pointer; font-size:0.85rem;
+    color:var(--text); transition:var(--transition);
+  }
+  .user-btn:hover { border-color:var(--accent); }
+  .user-dropdown {
+    position:absolute; right:0; top:100%; margin-top:6px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); min-width:160px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    z-index:1000; overflow:hidden; display:none;
+  }
+  .user-dropdown.show { display:block; animation:slideUp 0.2s ease-out; }
+  .user-dropdown a {
+    display:block; padding:10px 16px; font-size:0.84rem; color:var(--text);
+    text-decoration:none; cursor:pointer; transition:var(--transition);
+  }
+  .user-dropdown a:hover { background:var(--surface2); color:var(--accent); }
+  .auth-tabs { display:flex; gap:0; margin-bottom:20px; border-bottom:2px solid var(--border); }
+  .auth-tab {
+    flex:1; padding:10px; text-align:center; cursor:pointer;
+    font-size:0.9rem; font-weight:600; color:var(--text-dim);
+    border-bottom:2px solid transparent; margin-bottom:-2px;
+    transition:var(--transition);
+  }
+  .auth-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
   /* ========== 响应式 ========== */
   @media (max-width:768px) {
     .hero { padding:60px 16px 40px; }
@@ -471,6 +509,65 @@
     .card-thumb { height:160px; }
     .detail-specs { grid-template-columns:repeat(2,1fr); }
   }
+
+  /* ========== Pexels 视频播放器 ========== */
+  .video-player-wrap { position:relative; width:100%; border-radius:var(--radius); overflow:hidden; background:#000; }
+  .video-player-wrap video { width:100%; height:auto; max-height:60vh; display:block; border-radius:var(--radius); }
+  .video-player-wrap .play-overlay {
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.35); cursor:pointer; transition:opacity 0.3s;
+  }
+  .video-player-wrap .play-overlay:hover { background:rgba(0,0,0,0.25); }
+  .video-player-wrap .play-icon {
+    width:72px; height:72px; border-radius:50%; background:rgba(108,92,231,0.85);
+    display:flex; align-items:center; justify-content:center; font-size:2rem;
+    color:#fff; transition:transform 0.3s; box-shadow:0 8px 32px rgba(108,92,231,0.4);
+  }
+  .video-player-wrap .play-overlay:hover .play-icon { transform:scale(1.1); }
+
+  /* ========== Pexels 标识 ========== */
+  .card-badge.pexels { background:linear-gradient(135deg,#05a081,#06d6a0); color:#fff; }
+  .card-badge.uploaded { background:rgba(108,92,231,0.88); color:#fff; }
+  .pexels-credit { font-size:0.7rem; color:var(--text-dim); margin-top:8px; }
+  .pexels-credit a { color:var(--accent); text-decoration:none; }
+
+  /* ========== Pexels 搜索切换 ========== */
+  .pexels-search-row {
+    display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .pexels-toggle {
+    display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none;
+    padding:6px 14px; border-radius:20px; font-size:0.82rem; font-weight:600;
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--text-dim); transition:all var(--transition); white-space:nowrap;
+  }
+  .pexels-toggle:hover { border-color:var(--accent); color:var(--text); }
+  .pexels-toggle.active {
+    background:linear-gradient(135deg,#05a081,#06d6a0); color:#fff;
+    border-color:transparent;
+  }
+  .pexels-toggle .pexels-dot {
+    width:8px; height:8px; border-radius:50%; background:currentColor;
+    transition:all 0.3s;
+  }
+  .pexels-loading {
+    text-align:center; padding:60px 0; color:var(--text-dim);
+  }
+  .pexels-loading .spinner {
+    width:36px; height:36px; border:3px solid var(--border);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin 0.8s linear infinite; margin:0 auto 16px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .pexels-empty {
+    text-align:center; padding:60px 0; color:var(--text-dim);
+  }
+  .pexels-hint {
+    font-size:0.78rem; color:var(--text-dim); margin-top:4px;
+  }
+  .pexels-count {
+    font-size:0.8rem; color:var(--text-dim); white-space:nowrap;
+  }
 </style>
 </head>
 <body>
@@ -485,6 +582,7 @@
     <li><a href="#/admin" data-route="/admin" id="adminLink" style="display:none">管理后台</a></li>
   </ul>
   <div class="nav-actions">
+    <span id="userMenuContainer"></span>
     <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
       <span class="icon-sun">☀️</span>
       <span class="icon-moon">🌙</span>
@@ -507,6 +605,7 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal()">关闭</button>
       <button class="btn btn-outline btn-sm" id="modalDetailBtn">查看详情</button>
+      <button class="btn btn-fav" id="modalFavBtn" style="font-size:0.8rem;">☆ 加入收藏</button>
       <button class="btn btn-download" id="modalDownloadBtn">下载素材</button>
     </div>
   </div>
@@ -534,9 +633,111 @@ const ASSETS = [
   { id:12, title:'星空银河延时',   cat:'自然风光', res:'8K', dur:'1:30', size:'780MB', fps:24, format:'MP4', badge:'pro',    desc:'璀璨星空银河延时摄影，斗转星移，震撼人心。' },
 ];
 
+// === 数据持久化 ===
+const ASSETS_KEY = 'pixelstock_assets';
+function persistAssets() { localStorage.setItem(ASSETS_KEY, JSON.stringify(ASSETS)); }
+(function(){
+  const saved = localStorage.getItem(ASSETS_KEY);
+  if (saved) { const arr=JSON.parse(saved); ASSETS.length=0; ASSETS.push(...arr); }
+  else persistAssets();
+})();
+
 const cats = ['全部', ...new Set(ASSETS.map(a=>a.cat))];
 let activeCat = '全部';
 let currentAsset = null;
+
+// ====== Pexels API ======
+const PEXELS_KEY = localStorage.getItem('pexels_api_key') || '';
+
+let pexelsResults = [];
+let pexelsEnabled = false;
+let pexelsLoading = false;
+
+function setPexelsKey(key) {
+  localStorage.setItem('pexels_api_key', key);
+  showToast(key ? 'Pexels API Key 已保存' : 'API Key 已清除');
+}
+
+async function fetchPexelsVideos(q, page = 1) {
+  if (!PEXELS_KEY) { pexelsResults = []; return []; }
+  pexelsLoading = true;
+  try {
+    const res = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=30&page=${page}`, {
+      headers: { 'Authorization': PEXELS_KEY }
+    });
+    const data = await res.json();
+    const videos = (data.videos || []).map(v => ({
+      id: 'pxl_' + v.id,
+      title: v.user?.name ? `${v.user.name} - 视频` : 'Pexels 视频',
+      cat: detectPexelsCat(q),
+      res: detectRes(v.video_files),
+      dur: formatDur(v.duration),
+      size: formatSize(v.video_files),
+      fps: v.video_files[0]?.fps || 30,
+      format: v.video_files[0]?.file_type?.split('/')[1]?.toUpperCase() || 'MP4',
+      badge: 'pexels',
+      desc: q || '',
+      pexels: true,
+      pexelsUrl: v.url,
+      pexelsUser: v.user?.name || '',
+      pexelsUserUrl: v.user?.url || '',
+      thumbnail: v.image || v.video_pictures?.[0]?.picture || '',
+      videoFile: bestVideo(v.video_files),
+      videoOptions: v.video_files
+    }));
+    pexelsResults = videos;
+    return videos;
+  } catch (e) {
+    console.error('Pexels fetch error:', e);
+    pexelsResults = [];
+    return [];
+  } finally { pexelsLoading = false; }
+}
+
+function detectRes(files) {
+  const max = Math.max(...files.map(f => f.width || 0));
+  if (max >= 3840) return '4K';
+  if (max >= 2560) return '2K';
+  return '1080p';
+}
+function formatDur(sec) { const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
+function formatSize(files) {
+  const max = files.reduce((a, f) => Math.max(a, f.width || 0), 0);
+  const file = files.find(f => f.width === max) || files[0];
+  if (!file) return 'N/A';
+  const mb = file.file_size ? file.file_size / 1048576 : 0;
+  return mb > 1024 ? (mb / 1024).toFixed(1) + 'GB' : mb.toFixed(0) + 'MB';
+}
+function bestVideo(files) {
+  return files.find(f => f.quality === 'hd') || files.find(f => f.quality === 'sd') || files[0];
+}
+function detectPexelsCat(q) {
+  const m = {
+    'nature':'自然风光','自然':'自然风光','风景':'自然风光','山':'自然风光','海':'自然风光','森林':'自然风光','湖':'自然风光',
+    'city':'城市建筑','城市':'城市建筑','建筑':'城市建筑','街':'城市建筑','都市':'城市建筑',
+    'tech':'科技特效','科技':'科技特效','数据':'科技特效','粒子':'科技特效','特效':'科技特效',
+    'transition':'特效转场','转场':'特效转场',
+    'slow':'慢动作','慢动作':'慢动作','慢镜头':'慢动作'
+  };
+  for (const [k, v] of Object.entries(m)) { if (q.toLowerCase().includes(k)) return v; }
+  return '精选素材';
+}
+
+function togglePexels() {
+  pexelsEnabled = !pexelsEnabled;
+  if (pexelsEnabled && PEXELS_KEY) {
+    const q = (document.getElementById('searchInput') || {}).value || '';
+    if (q && q.length >= 2) searchPexels(q);
+  }
+  renderGrid();
+}
+
+async function searchPexels(q) {
+  pexelsLoading = true;
+  renderGrid();
+  await fetchPexelsVideos(q);
+  renderGrid();
+}
 
 // ====== 主题 ======
 function toggleTheme() {
@@ -562,20 +763,107 @@ function showToast(msg) {
 function openPreview(id) {
   currentAsset=ASSETS.find(a=>a.id===id); if(!currentAsset) return;
   document.getElementById('modalTitle').textContent=currentAsset.title;
-  document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.dur}</span></div>`;
+  
+  // 真实上传素材：显示实际视频
+  if(currentAsset.uploaded){
+    getVideoFile(String(id)).then(rec => {
+      if(rec){
+        const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        document.getElementById('modalPreview').innerHTML=`
+          <div class="video-player-wrap">
+            <video src="${url}" controls preload="metadata"
+              style="width:100%;max-height:60vh;border-radius:var(--radius);display:block;"></video>
+          </div>`;
+        // 清理 blob URL
+        const vid = document.querySelector('#modalPreview video');
+        if(vid) vid.addEventListener('loadeddata', () => { /* keep URL alive during playback */ });
+      }
+    }).catch(() => {
+      document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.size}</span></div>`;
+    });
+  } else {
+    document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.dur}</span></div>`;
+  }
+  
   document.getElementById('modalInfo').innerHTML=['分辨率','帧率','文件大小','时长','格式','授权'].map((l,i)=>`<div class="modal-info-item"><div class="val">${[currentAsset.res,currentAsset.fps+'fps',currentAsset.size,currentAsset.dur,currentAsset.format,currentAsset.badge==='free'?'免费':'PRO'][i]}</div><div class="lbl">${l}</div></div>`).join('');
   document.getElementById('modalTags').innerHTML=`<span class="tag active">${currentAsset.cat}</span><span class="tag">${currentAsset.res}</span><span class="tag">${currentAsset.format}</span>`;
   document.getElementById('modalDownloadBtn').onclick=()=>{downloadAsset(currentAsset.id);};
   document.getElementById('modalDetailBtn').onclick=()=>{closeModal();navigate('/detail/'+currentAsset.id);};
+  document.getElementById('modalFavBtn').className=`btn btn-fav fav-btn${isFavorited(currentAsset.id)?' favorited':''}`;
+  document.getElementById('modalFavBtn').setAttribute('data-id', currentAsset.id);
+  document.getElementById('modalFavBtn').onclick=(e)=>{toggleFavorite(currentAsset.id,e);};
+  document.getElementById('modalFavBtn').innerHTML=`${favIconHtml(currentAsset.id)} ${isFavorited(currentAsset.id)?'已收藏':'加入收藏'}`;
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.body.style.overflow='hidden';
 }
 function closeModal(e) { if(e&&e.target!==document.getElementById('modalOverlay'))return; document.getElementById('modalOverlay').classList.add('hidden'); document.body.style.overflow=''; currentAsset=null; }
-function downloadAsset(id){ const a=ASSETS.find(x=>x.id===id); if(!a)return; showToast(`正在准备下载「${a.title}」(${a.size})...`); setTimeout(()=>showToast(`「${a.title}」下载完成！`),1500); }
+function downloadAsset(id){
+  const idStr=String(id);
+  // Pexels 素材：用真实链接下载
+  if(idStr.startsWith('pxl_')){
+    const p=pexelsResults.find(x=>x.id===idStr);
+    if(!p) return;
+    showToast(`正在下载「${p.title}」...`);
+    const link=document.createElement('a');
+    link.href=p.videoFile?.link||p.videoOptions[0]?.link;
+    link.download=p.title+'.'+p.format.toLowerCase();
+    link.target='_blank';
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    showToast(`下载完成！`);
+    return;
+  }
+  // 真实上传的素材：从 IndexedDB 获取并下载
+  const a=ASSETS.find(x=>String(x.id)===idStr);
+  if(!a){showToast('素材不存在');return;}
+  if(a.uploaded){
+    showToast(`正在下载「${a.title}」...`);
+    getVideoFile(idStr).then(rec => {
+      if(!rec){showToast('文件未找到');return;}
+      const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = rec.name || (a.title + '.' + (a.format||'mp4').toLowerCase());
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(`「${a.title}」下载完成！`);
+    }).catch(err => {
+      console.error(err);
+      showToast('下载失败，请重试');
+    });
+    return;
+  }
+  // 模拟素材：仅提示
+  showToast(`正在准备下载「${a.title}」(${a.size})...`); setTimeout(()=>showToast(`「${a.title}」下载完成！`),1500);
+}
+function openPexelsPreview(id){
+  const p=pexelsResults.find(x=>x.id===id); if(!p) return;
+  const videoUrl=p.videoFile?.link||p.videoOptions[0]?.link||'';
+  const poster=p.thumbnail||'';
+  document.getElementById('modalTitle').textContent=p.title;
+  document.getElementById('modalPreview').innerHTML=`
+    <div class="video-player-wrap">
+      <video id="pexelsVideoPlayer" src="${videoUrl}" poster="${poster}" controls preload="metadata"
+        style="width:100%;max-height:60vh;border-radius:var(--radius);display:block;"></video>
+    </div>`;
+  document.getElementById('modalInfo').innerHTML=['分辨率','帧率','大小','时长','格式','来源'].map((l,i)=>`<div class="modal-info-item"><div class="val">${[p.res,p.fps+'fps',p.size,p.dur,p.format,'Pexels'][i]}</div><div class="lbl">${l}</div></div>`).join('');
+  document.getElementById('modalTags').innerHTML=`<span class="tag active">${p.cat}</span><span class="tag">${p.res}</span><span class="tag">${p.format}</span><span class="tag">Pexels</span>`;
+  document.getElementById('modalDownloadBtn').onclick=()=>{downloadAsset(p.id);};
+  document.getElementById('modalDetailBtn').onclick=()=>{window.open(p.pexelsUrl,'_blank');};
+  document.getElementById('modalFavBtn').className=`btn btn-fav btn-lg fav-btn${isFavorited(p.id)?' favorited':''}`;
+  document.getElementById('modalFavBtn').setAttribute('data-id', p.id);
+  document.getElementById('modalFavBtn').onclick=(e)=>{toggleFavorite(p.id,e);};
+  document.getElementById('modalFavBtn').innerHTML=`${favIconHtml(p.id)} ${isFavorited(p.id)?'已收藏':'加入收藏'}`;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  currentAsset=p;
+}
 
 // ====== 首页 ======
 function filterAssets() {
   const q=(document.getElementById('searchInput')||{}).value||'';
+  if (pexelsEnabled) { return pexelsResults; }
   return ASSETS.filter(a=>{
     const mc=activeCat==='全部'||a.cat===activeCat;
     const ms=!q||a.title.toLowerCase().includes(q.toLowerCase())||a.cat.includes(q)||a.desc.includes(q);
@@ -585,9 +873,19 @@ function filterAssets() {
 
 function renderHome() {
   const app=document.getElementById('app');
+  const hasKey = !!PEXELS_KEY;
   app.innerHTML=`
     <section class="hero"><h1>高质量<span>视频素材</span>一站下载</h1><p>精选 4K / 8K 高清素材，覆盖自然风光、城市夜景、科技特效等多种场景，助你快速产出专业级视频。</p><div class="hero-stats"><div class="hero-stat"><div class="num">200+</div><div class="label">高清素材</div></div><div class="hero-stat"><div class="num">4K / 8K</div><div class="label">最高分辨率</div></div><div class="hero-stat"><div class="num">免费</div><div class="label">个人 &amp; 商用</div></div></div></section>
-    <div class="toolbar"><div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索素材关键词..." oninput="renderGrid()"></div><div class="filter-tags" id="filterTags">${cats.map(c=>`<span class="tag${c===activeCat?' active':''}" onclick="setCategory('${c}')">${c}</span>`).join('')}</div></div>
+    <div class="toolbar">
+      <div class="pexels-search-row">
+        <div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="${pexelsEnabled ? '搜索 Pexels 视频素材...' : '搜索素材关键词...'}" oninput="onSearchInput()"></div>
+        <div class="pexels-toggle${pexelsEnabled?' active':''}" onclick="togglePexels()" id="pexelsToggleBtn">
+          <span class="pexels-dot"></span>Pexels 搜索
+        </div>
+        ${pexelsResults.length ? `<span class="pexels-count">${pexelsResults.length} 个结果</span>` : ''}
+      </div>
+      <div class="filter-tags" id="filterTags">${cats.map(c=>`<span class="tag${c===activeCat?' active':''}" onclick="setCategory('${c}')">${c}</span>`).join('')}</div>
+    </div>
     <div class="page-container"><div class="grid" id="assetGrid"></div></div>
   `;
   renderGrid();
@@ -596,25 +894,52 @@ function renderHome() {
 function renderGrid() {
   const assets=filterAssets(), grid=document.getElementById('assetGrid');
   if(!grid) return;
-  if(!assets.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">🔍</div><p>未找到匹配的素材</p></div>`;return;}
+  if (pexelsLoading) { grid.innerHTML=`<div class="pexels-loading"><div class="spinner"></div><p>正在从 Pexels 搜索视频素材...</p></div>`; return; }
+  if(!assets.length){
+    const emptyMsg = pexelsEnabled ? 'Pexels 无搜索结果，换个关键词试试？' : '未找到匹配的素材';
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">🔍</div><p>${emptyMsg}</p>${pexelsEnabled&&!PEXELS_KEY?`<p class="pexels-hint">请先在 <a onclick="navigate('/admin')" style="color:var(--accent);cursor:pointer;text-decoration:underline;">管理后台</a> 设置 Pexels API Key</p>`:''}</div>`; return; }
   grid.innerHTML=assets.map((a,i)=>`
-    <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="openPreview(${a.id})">
-      <div class="card-thumb" style="background:${thumbBg(a.id)};"><div class="thumb-inner"><span class="thumb-icon">🎬</span></div><span class="card-badge ${a.badge}">${a.badge==='free'?'免费':'PRO'}</span></div>
-      <div class="card-body"><div class="card-title">${a.title}</div><div class="card-meta"><span>📐 ${a.res}</span><span>⏱ ${a.dur}</span><span>📦 ${a.size}</span><span>🎯 ${a.fps}fps</span></div>
-      <div class="card-actions"><button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset(${a.id})">下载</button><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button></div></div></div>
+    <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="${a.pexels?`openPexelsPreview('${a.id}')`:`openPreview(${a.id})`}">
+      <div class="card-thumb" style="background:${a.thumbnail?`url(${a.thumbnail}) center/cover no-repeat`:'linear-gradient(135deg,#1a1a2e,#16213e)'};">
+        ${a.thumbnail?`<img src="${a.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${a.title}" loading="lazy">`:''}
+        <span class="card-badge ${a.uploaded?'uploaded':a.badge}">${a.uploaded?'已上传':a.badge==='pexels'?'Pexels':a.badge==='free'?'免费':'PRO'}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${a.title}</div>
+        <div class="card-meta"><span>📐 ${a.res}</span><span>⏱ ${a.dur}</span><span>📦 ${a.size}</span><span>🎯 ${a.fps}fps</span></div>
+        <div class="card-actions">
+          <button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset('${a.id}')">下载</button>
+          ${a.pexels?`<a class="btn btn-outline btn-sm" href="${a.pexelsUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;">Pexels</a>`:`<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button>`}
+          <button class="btn btn-fav btn-sm fav-btn${isFavorited(a.id)?' favorited':''}" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" title="收藏">${favIconHtml(a.id)}</button>
+        </div>
+        ${a.pexels?`<p class="pexels-credit">by <a href="${a.pexelsUserUrl}" target="_blank">${a.pexelsUser}</a></p>`:''}
+      </div></div>
   `).join('');
   requestAnimationFrame(()=>document.querySelectorAll('.card.reveal').forEach(el=>el.classList.add('visible')));
 }
-function setCategory(cat){activeCat=cat;renderHome();}
+function setCategory(cat){ activeCat=cat; if(pexelsEnabled){pexelsEnabled=false;pexelsResults=[];} renderHome(); }
+function onSearchInput() {
+  if (pexelsEnabled) {
+    clearTimeout(window._pexelsDebounce);
+    window._pexelsDebounce = setTimeout(() => {
+      const q = (document.getElementById('searchInput')||{}).value||'';
+      if (q.length >= 2) { searchPexels(q); } else { pexelsResults=[]; renderGrid(); }
+    }, 500);
+  } else { renderGrid(); }
+}
 
 // ====== 详情页 ======
 function renderDetail(id) {
   const a=ASSETS.find(x=>x.id===id);
   if(!a){navigate('/');return;}
   const app=document.getElementById('app');
+  const previewHTML = a.uploaded
+    ? `<div class="detail-preview" style="min-height:360px;display:flex;align-items:center;justify-content:center;background:#000;"><video id="detailVideo" controls preload="metadata" style="width:100%;max-height:360px;display:block;"></video></div>`
+    : `<div class="detail-preview" style="background:${thumbBg(a.id)};min-height:360px;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;"><span style="font-size:6rem;opacity:0.5;">🎬</span><div style="color:var(--text-dim);margin-top:8px;">${a.res} / ${a.format}</div></div></div>`;
+  
   app.innerHTML=`
     <div class="page-container detail-hero">
-      <div class="detail-preview" style="background:${thumbBg(a.id)};min-height:360px;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;"><span style="font-size:6rem;opacity:0.5;">🎬</span><div style="color:var(--text-dim);margin-top:8px;">${a.res} / ${a.format}</div></div></div>
+      ${previewHTML}
       <div class="detail-info">
         <a class="back-link" onclick="navigate('/')">← 返回素材库</a>
         <h1>${a.title}</h1>
@@ -630,11 +955,22 @@ function renderDetail(id) {
         <div class="filter-tags" style="margin-bottom:24px;"><span class="tag active">${a.cat}</span><span class="tag">${a.res}</span><span class="tag">${a.format}</span></div>
         <div class="detail-actions">
           <button class="btn btn-download btn-lg" onclick="downloadAsset(${a.id})">⬇ 下载素材 (${a.size})</button>
+          <button class="btn btn-fav btn-lg fav-btn${isFavorited(a.id)?' favorited':''}" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" style="font-size:1rem;">${favIconHtml(a.id)} ${isFavorited(a.id)?'已收藏':'加入收藏'}</button>
           <button class="btn btn-outline btn-lg" onclick="navigate('/')">返回列表</button>
         </div>
       </div>
     </div>
   `;
+  // 加载真实视频
+  if(a.uploaded){
+    getVideoFile(String(id)).then(rec => {
+      const vid = document.getElementById('detailVideo');
+      if(vid && rec){
+        const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+        vid.src = URL.createObjectURL(blob);
+      }
+    }).catch(() => {});
+  }
 }
 
 // ====== 关于页 ======
@@ -717,14 +1053,496 @@ function submitUpload() {
   if(!title){showToast('请输入素材标题');return;}
   if(!cat){showToast('请选择分类');return;}
   if(!uploadedFiles.length){showToast('请选择至少一个视频文件');return;}
-  const newId=ASSETS.length+1;
+  
+  const newId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
   const res=document.getElementById('uploadRes')?.value||'4K';
   const fps=parseInt(document.getElementById('uploadFps')?.value)||30;
   const license=document.getElementById('uploadLicense')?.value||'free';
   const desc=document.getElementById('uploadDesc')?.value||'用户上传素材';
-  ASSETS.push({id:newId,title,cat,res,dur:'未知',size:'未知',fps,format:'MP4',badge:license,desc,status:'pending'});
-  showToast(`素材「${title}」已提交审核！`);
-  setTimeout(()=>navigate('/'),800);
+  const size = (uploadedFiles[0].size / 1024 / 1024).toFixed(1) + ' MB';
+  const dur = '未知';
+  const format = uploadedFiles[0].name.split('.').pop().toUpperCase() || 'MP4';
+  
+  // 保存文件到 IndexedDB
+  saveVideoFile(newId, uploadedFiles[0]).then(() => {
+    // 保存元数据
+    ASSETS.push({
+      id: newId, title, cat, res, dur, size, fps, format, 
+      badge: license, desc, status: 'pending', 
+      uploaded: true, uploadTime: new Date().toISOString(),
+      fileName: uploadedFiles[0].name, fileSize: uploadedFiles[0].size
+    });
+    persistAssets();
+    addUploadHistory({title, cat, res, status: 'pending'});
+    showToast(`素材「${title}」已提交审核！文件已保存。`);
+    setTimeout(()=>navigate('/'), 800);
+  }).catch(err => {
+    console.error('保存文件失败:', err);
+    showToast('文件保存失败，请重试');
+  });
+}
+
+// ====== 真实文件存储系统 ======
+const DB_NAME = 'pixelstock_files';
+const DB_VERSION = 1;
+let db = null;
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => { db = request.result; resolve(); };
+    request.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('videos')) {
+        db.createObjectStore('videos', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+async function saveVideoFile(id, file) {
+  if (!db) await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readwrite');
+    const store = tx.objectStore('videos');
+    const reader = new FileReader();
+    reader.onload = e => {
+      store.put({ id, data: e.target.result, name: file.name, type: file.type, size: file.size });
+      resolve();
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function getVideoFile(id) {
+  if (!db) await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readonly');
+    const store = tx.objectStore('videos');
+    const request = store.get(String(id));
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteVideoFile(id) {
+  if (!db) await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readwrite');
+    const store = tx.objectStore('videos');
+    store.delete(String(id));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// 初始化数据库
+setTimeout(() => initDB().catch(console.warn), 100);
+
+// ====== 通用弹窗 ======
+let _genericModalOverlay = null;
+function showModal(html, className) {
+  if (_genericModalOverlay) _genericModalOverlay.remove();
+  _genericModalOverlay = document.createElement('div');
+  _genericModalOverlay.className = 'modal-overlay';
+  _genericModalOverlay.onclick = function(e) { if (e.target === _genericModalOverlay) closeModal(); };
+  _genericModalOverlay.innerHTML = `<div class="modal ${className||''}" onclick="event.stopPropagation()"><div class="modal-body">${html}</div></div>`;
+  document.body.appendChild(_genericModalOverlay);
+  document.body.style.overflow = 'hidden';
+}
+const _origCloseModal = closeModal;
+closeModal = function(e) {
+  if (_genericModalOverlay) {
+    _genericModalOverlay.remove();
+    _genericModalOverlay = null;
+    document.body.style.overflow = '';
+  }
+  if (document.getElementById('modalOverlay')?.classList.contains('hidden')) {}
+  else _origCloseModal(e);
+};
+
+// ====== 用户系统 ======
+const USERS_KEY = 'pixelstock_users';
+const CURRENT_USER_KEY = 'pixelstock_current_user';
+const UPLOAD_HISTORY_KEY = 'pixelstock_upload_history';
+const FAVORITES_KEY = 'pixelstock_favorites';
+
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+function getCurrentUser() {
+  try { return JSON.parse(localStorage.getItem(CURRENT_USER_KEY)); }
+  catch(e) { return null; }
+}
+function setCurrentUser(user) { localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user)); }
+function clearCurrentUser() { localStorage.removeItem(CURRENT_USER_KEY); }
+function getUploadHistory() {
+  try { return JSON.parse(localStorage.getItem(UPLOAD_HISTORY_KEY)) || []; }
+  catch(e) { return []; }
+}
+function addUploadHistory(item) {
+  const history = getUploadHistory();
+  history.unshift({ ...item, time: new Date().toISOString() });
+  if (history.length > 50) history.length = 50;
+  localStorage.setItem(UPLOAD_HISTORY_KEY, JSON.stringify(history));
+}
+
+// ====== 收藏夹系统 ======
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function getUserFavorites(username) {
+  const all = getFavorites();
+  return all[username] || [];
+}
+function setUserFavorites(username, ids) {
+  const all = getFavorites();
+  all[username] = ids;
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(all));
+}
+function isFavorited(id) {
+  const user = getCurrentUser();
+  if (!user) return false;
+  return getUserFavorites(user.username).includes(String(id));
+}
+function toggleFavorite(id, e) {
+  if (e) e.stopPropagation();
+  const user = getCurrentUser();
+  if (!user) { showToast('请先登录'); showAuthModal('login'); return; }
+  const favs = getUserFavorites(user.username);
+  const sid = String(id);
+  const idx = favs.indexOf(sid);
+  if (idx >= 0) { favs.splice(idx, 1); showToast('已取消收藏'); }
+  else { favs.push(sid); showToast('已加入收藏'); }
+  setUserFavorites(user.username, favs);
+  refreshCurrentFavUI();
+}
+function refreshCurrentFavUI() {
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    const id = btn.dataset.id;
+    btn.classList.toggle('favorited', isFavorited(id));
+    const icon = btn.querySelector('.fav-icon');
+    if (icon) icon.textContent = isFavorited(id) ? '★' : '☆';
+  });
+}
+function favIconHtml(id) {
+  return `<span class="fav-icon">${isFavorited(id) ? '★' : '☆'}</span>`;
+}
+function renderFavorites() {
+  const user = getCurrentUser();
+  if (!user) { showAuthModal('login'); return; }
+  const favIds = getUserFavorites(user.username);
+  const allAssets = [...ASSETS, ...pexelsResults.map(p => ({ ...p, id: p.id }))];
+  const favAssets = favIds.map(id => allAssets.find(a => String(a.id) === String(id))).filter(Boolean);
+
+  document.getElementById('app').innerHTML = `
+    <div class="page-container">
+      <h1 style="margin-bottom:8px;">⭐ 我的收藏</h1>
+      <p class="upload-sub">共 ${favAssets.length} 个收藏素材</p>
+      ${favAssets.length === 0 ? `<div style="text-align:center;padding:80px 0;color:var(--text-dim);"><div style="font-size:3.5rem;margin-bottom:16px;">📭</div><p>收藏夹空空如也，去素材库逛逛吧！</p><button class="btn btn-primary" onclick="navigate('/')" style="margin-top:16px;">前往素材库</button></div>` : ''}
+      <div class="grid" id="favGrid" style="margin-top:24px;">${favAssets.map((a,i) => `
+        <div class="card reveal" style="transition-delay:${i*0.05}s" onclick="${a.pexels?`openPexelsPreview('${a.id}')`:`openPreview(${a.id})`}">
+          <div class="card-thumb" style="background:${a.thumbnail?`url(${a.thumbnail}) center/cover no-repeat`:'linear-gradient(135deg,#1a1a2e,#16213e)'};">
+            ${a.thumbnail?`<img src="${a.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${a.title}" loading="lazy">`:''}
+            <span class="card-badge ${a.uploaded?'uploaded':a.badge}">${a.uploaded?'已上传':a.badge==='pexels'?'Pexels':a.badge==='free'?'免费':'PRO'}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${a.title}</div>
+            <div class="card-meta"><span>📐 ${a.res||'N/A'}</span><span>⏱ ${a.dur||'N/A'}</span><span>📦 ${a.size||'N/A'}</span><span>🎯 ${a.fps||'N/A'}fps</span></div>
+            <div class="card-actions">
+              <button class="btn btn-download btn-sm" onclick="event.stopPropagation();downloadAsset('${a.id}')">下载</button>
+              ${a.pexels?`<a class="btn btn-outline btn-sm" href="${a.pexelsUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;">Pexels</a>`:`<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate('/detail/${a.id}')">详情</button>`}
+              <button class="btn btn-fav btn-sm fav-btn favorited" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" title="取消收藏">${favIconHtml(a.id)}</button>
+            </div>
+            ${a.pexels?`<p class="pexels-credit">by <a href="${a.pexelsUserUrl}" target="_blank">${a.pexelsUser}</a></p>`:''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+  `;
+  requestAnimationFrame(()=>document.querySelectorAll('.card.reveal').forEach(el=>el.classList.add('visible')));
+}
+
+function renderUserMenu() {
+  const user = getCurrentUser();
+  const container = document.getElementById('userMenuContainer');
+  if (!container) return;
+  if (user) {
+    container.innerHTML = `
+      <div class="user-menu">
+        <button class="user-btn" onclick="toggleUserDropdown()">
+          <span>👤</span><span>${user.username}</span><span style="font-size:0.6rem;">▼</span>
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <a onclick="navigate('/');toggleUserDropdown();">🏠 素材库</a>
+          <a onclick="navigate('/favorites');toggleUserDropdown();">⭐ 收藏夹</a>
+          <a onclick="navigate('/upload');toggleUserDropdown();">📤 上传素材</a>
+          <a onclick="showUploadHistory();toggleUserDropdown();">📋 上传历史</a>
+          <a onclick="showUserInfo();toggleUserDropdown();">ℹ️ 账户信息</a>
+          <a onclick="logout();toggleUserDropdown();">🚪 退出登录</a>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `<button class="btn btn-outline btn-sm" onclick="showAuthModal('login')">登录 / 注册</button>`;
+  }
+}
+
+function toggleUserDropdown() {
+  const dd = document.getElementById('userDropdown');
+  if (dd) dd.classList.toggle('show');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-menu')) {
+    document.querySelectorAll('.user-dropdown.show').forEach(d => d.classList.remove('show'));
+  }
+});
+
+function showAuthModal(mode) {
+  const isLogin = mode === 'login';
+  showModal(`
+    <div class="auth-tabs">
+      <div class="auth-tab${isLogin?' active':''}" onclick="switchAuthTab('login')">登录</div>
+      <div class="auth-tab${!isLogin?' active':''}" onclick="switchAuthTab('register')">注册</div>
+    </div>
+    <div id="authFormContent">
+      ${isLogin ? renderLoginForm() : renderRegisterForm()}
+    </div>
+  `, 'user-modal');
+}
+
+function switchAuthTab(mode) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-tab')[mode==='login'?0:1].classList.add('active');
+  document.getElementById('authFormContent').innerHTML = mode === 'login' ? renderLoginForm() : renderRegisterForm();
+}
+
+let currentLoginType = 'username';
+function renderLoginForm() {
+  return `
+    <div class="login-type-tabs" style="display:flex;gap:0;margin-bottom:16px;border-radius:8px;overflow:hidden;">
+      <div class="login-type-tab active" onclick="switchLoginType('username')" id="loginTabUsername" style="flex:1;text-align:center;padding:10px;background:var(--accent);color:#fff;cursor:pointer;font-size:0.9rem;">用户名登录</div>
+      <div class="login-type-tab" onclick="switchLoginType('phone')" id="loginTabPhone" style="flex:1;text-align:center;padding:10px;background:var(--border);color:var(--text-dim);cursor:pointer;font-size:0.9rem;">手机号登录</div>
+    </div>
+    <div id="loginFieldContainer">
+      <div class="form-group"><label>用户名</label><input type="text" id="loginUsername" placeholder="输入用户名"></div>
+    </div>
+    <div class="form-group"><label>密码</label><input type="password" id="loginPassword" placeholder="输入密码"></div>
+    <button class="btn btn-primary btn-lg" onclick="doLogin()" style="width:100%;margin-top:8px;">登录</button>
+    <p style="text-align:center;margin-top:12px;font-size:0.8rem;">
+      <a style="color:var(--accent);cursor:pointer;text-decoration:underline;" onclick="showForgotPassword()">忘记密码？</a>
+    </p>
+  `;
+}
+
+function switchLoginType(type) {
+  currentLoginType = type;
+  const tabUsername = document.getElementById('loginTabUsername');
+  const tabPhone = document.getElementById('loginTabPhone');
+  if (type === 'username') {
+    tabUsername.style.background = 'var(--accent)'; tabUsername.style.color = '#fff';
+    tabPhone.style.background = 'var(--border)'; tabPhone.style.color = 'var(--text-dim)';
+    document.getElementById('loginFieldContainer').innerHTML = '<div class="form-group"><label>用户名</label><input type="text" id="loginUsername" placeholder="输入用户名"></div>';
+  } else {
+    tabPhone.style.background = 'var(--accent)'; tabPhone.style.color = '#fff';
+    tabUsername.style.background = 'var(--border)'; tabUsername.style.color = 'var(--text-dim)';
+    document.getElementById('loginFieldContainer').innerHTML = '<div class="form-group"><label>手机号</label><input type="tel" id="loginPhone" placeholder="输入11位手机号"></div>';
+  }
+}
+
+function renderRegisterForm() {
+  return `
+    <div class="form-group"><label>用户名</label><input type="text" id="regUsername" placeholder="3-20位字母数字或中文"></div>
+    <div class="form-group"><label>手机号（选填，可用于登录）</label><input type="tel" id="regPhone" placeholder="输入11位手机号"></div>
+    <div class="form-group"><label>邮箱</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+    <div class="form-group"><label>密码</label><input type="password" id="regPassword" placeholder="至少6位"></div>
+    <div class="form-group"><label>确认密码</label><input type="password" id="regPassword2" placeholder="再次输入密码"></div>
+    <button class="btn btn-primary btn-lg" onclick="doRegister()" style="width:100%;margin-top:8px;">注册</button>
+  `;
+}
+
+function doLogin() {
+  if (currentLoginType === 'phone') {
+    const phone = document.getElementById('loginPhone')?.value?.trim();
+    const password = document.getElementById('loginPassword')?.value;
+    if (!phone || !password) { showToast('请填写手机号和密码'); return; }
+    if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+    const users = loadUsers();
+    const found = Object.keys(users).find(u => users[u].phone === phone);
+    if (!found) { showToast('该手机号未注册'); return; }
+    if (users[found].password !== password) { showToast('密码错误'); return; }
+    setCurrentUser({ username: found, email: users[found].email, phone: users[found].phone });
+    closeModal();
+    renderUserMenu();
+    showToast(`欢迎回来，${found}！`);
+    return;
+  }
+  const username = document.getElementById('loginUsername')?.value?.trim();
+  const password = document.getElementById('loginPassword')?.value;
+  if (!username || !password) { showToast('请填写用户名和密码'); return; }
+  const users = loadUsers();
+  if (!users[username]) { showToast('用户不存在'); return; }
+  if (users[username].password !== password) { showToast('密码错误'); return; }
+  setCurrentUser({ username, email: users[username].email, phone: users[username].phone });
+  closeModal();
+  renderUserMenu();
+  showToast(`欢迎回来，${username}！`);
+}
+
+function doRegister() {
+  const username = document.getElementById('regUsername')?.value?.trim();
+  const phone = document.getElementById('regPhone')?.value?.trim();
+  const email = document.getElementById('regEmail')?.value?.trim();
+  const password = document.getElementById('regPassword')?.value;
+  const password2 = document.getElementById('regPassword2')?.value;
+  if (!username || !email || !password) { showToast('请填写所有必填字段'); return; }
+  if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]{3,20}$/.test(username)) { showToast('用户名需3-20位字母数字或中文'); return; }
+  if (phone && !/^1[3-9]\d{9}$/.test(phone)) { showToast('手机号格式不正确'); return; }
+  if (password.length < 6) { showToast('密码至少6位'); return; }
+  if (password !== password2) { showToast('两次密码不一致'); return; }
+  const users = loadUsers();
+  if (users[username]) { showToast('用户名已存在'); return; }
+  if (phone) {
+    const phoneExists = Object.keys(users).some(u => users[u].phone === phone);
+    if (phoneExists) { showToast('该手机号已被注册'); return; }
+  }
+  users[username] = { password, email, phone: phone || '' };
+  saveUsers(users);
+  setCurrentUser({ username, email, phone: phone || '' });
+  closeModal();
+  renderUserMenu();
+  showToast(`注册成功，欢迎 ${username}！`);
+}
+
+function logout() {
+  clearCurrentUser();
+  renderUserMenu();
+  showToast('已退出登录');
+}
+
+function showUserInfo() {
+  const user = getCurrentUser();
+  const users = loadUsers();
+  const userData = users[user?.username];
+  if (!userData) { showToast('用户信息获取失败'); return; }
+  showModal(`
+    <h2 style="margin-bottom:8px;">ℹ️ 账户信息</h2>
+    <div class="user-info-card" style="background:var(--bg2);border-radius:12px;padding:20px;margin-bottom:20px;">
+      <p><strong>用户名：</strong>${user.username}</p>
+      <p><strong>邮箱：</strong>${userData.email || '未设置'}</p>
+      <p><strong>手机号：</strong>${userData.phone || '未设置'}</p>
+      <p><strong>注册时间：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
+    </div>
+    <button class="btn btn-outline" onclick="closeModal()" style="width:100%;">关闭</button>
+  `, 'user-modal');
+}
+
+// ====== 忘记密码 ======
+function showForgotPassword() {
+  showModal(`
+    <h2 style="margin-bottom:8px;">🔑 找回密码</h2>
+    <p style="color:var(--text-dim);font-size:0.84rem;margin-bottom:20px;">请选择验证方式，输入对应信息验证身份。</p>
+    <div class="form-group"><label>验证方式</label>
+      <select id="resetMethod" onchange="toggleResetMethod()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);">
+        <option value="username">用户名+邮箱验证</option>
+        <option value="phone">手机号验证</option>
+      </select>
+    </div>
+    <div id="resetFields">
+      <div class="form-group"><label>用户名</label><input type="text" id="resetUsername" placeholder="输入用户名"></div>
+      <div class="form-group"><label>注册邮箱</label><input type="email" id="resetEmail" placeholder="输入注册邮箱"></div>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="verifyResetIdentity()" style="width:100%;margin-top:8px;">验证身份</button>
+    <p style="text-align:center;margin-top:12px;font-size:0.8rem;">
+      <a style="color:var(--accent);cursor:pointer;text-decoration:underline;" onclick="showAuthModal('login')">返回登录</a>
+    </p>
+  `, 'user-modal');
+}
+
+function toggleResetMethod() {
+  const method = document.getElementById('resetMethod').value;
+  const container = document.getElementById('resetFields');
+  if (method === 'phone') {
+    container.innerHTML = '<div class="form-group"><label>手机号</label><input type="tel" id="resetPhone" placeholder="输入注册手机号"></div>';
+  } else {
+    container.innerHTML = '<div class="form-group"><label>用户名</label><input type="text" id="resetUsername" placeholder="输入用户名"></div><div class="form-group"><label>注册邮箱</label><input type="email" id="resetEmail" placeholder="输入注册邮箱"></div>';
+  }
+}
+
+function verifyResetIdentity() {
+  const method = document.getElementById('resetMethod')?.value || 'username';
+  if (method === 'phone') {
+    const phone = document.getElementById('resetPhone')?.value?.trim();
+    if (!phone) { showToast('请输入手机号'); return; }
+    if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('手机号格式不正确'); return; }
+    const users = loadUsers();
+    const found = Object.keys(users).find(u => users[u].phone === phone);
+    if (!found) { showToast('该手机号未注册'); return; }
+    showModal(`
+      <h2 style="margin-bottom:8px;">🔑 重置密码</h2>
+      <p style="color:var(--text-dim);font-size:0.84rem;margin-bottom:20px;">手机号验证通过！请为 <strong>${found}</strong> 设置新密码。</p>
+      <div class="form-group"><label>新密码</label><input type="password" id="newPassword" placeholder="至少6位"></div>
+      <div class="form-group"><label>确认新密码</label><input type="password" id="newPassword2" placeholder="再次输入新密码"></div>
+      <button class="btn btn-primary btn-lg" onclick="doResetPassword('${found}')" style="width:100%;margin-top:8px;">重置密码</button>
+    `, 'user-modal');
+    return;
+  }
+  const username = document.getElementById('resetUsername')?.value?.trim();
+  const email = document.getElementById('resetEmail')?.value?.trim();
+  if (!username || !email) { showToast('请填写用户名和邮箱'); return; }
+  const users = loadUsers();
+  if (!users[username]) { showToast('用户名不存在'); return; }
+  if (users[username].email !== email) { showToast('邮箱与注册信息不匹配'); return; }
+  showModal(`
+    <h2 style="margin-bottom:8px;">🔑 重置密码</h2>
+    <p style="color:var(--text-dim);font-size:0.84rem;margin-bottom:20px;">身份验证通过！请为 <strong>${username}</strong> 设置新密码。</p>
+    <div class="form-group"><label>新密码</label><input type="password" id="newPassword" placeholder="至少6位"></div>
+    <div class="form-group"><label>确认新密码</label><input type="password" id="newPassword2" placeholder="再次输入新密码"></div>
+    <button class="btn btn-primary btn-lg" onclick="doResetPassword('${username}')" style="width:100%;margin-top:8px;">重置密码</button>
+  `, 'user-modal');
+}
+
+function doResetPassword(username) {
+  const pwd = document.getElementById('newPassword')?.value;
+  const pwd2 = document.getElementById('newPassword2')?.value;
+  if (!pwd) { showToast('请输入新密码'); return; }
+  if (pwd.length < 6) { showToast('密码至少6位'); return; }
+  if (pwd !== pwd2) { showToast('两次密码不一致'); return; }
+  const users = loadUsers();
+  users[username].password = pwd;
+  saveUsers(users);
+  closeModal();
+  showToast(`密码重置成功，请使用新密码登录`);
+  showAuthModal('login');
+}
+
+function showUploadHistory() {
+  const history = getUploadHistory();
+  const user = getCurrentUser();
+  showModal(`
+    <h2 style="margin-bottom:16px;">📋 上传历史</h2>
+    ${history.length === 0 ? `<p style="color:var(--text-dim);text-align:center;padding:30px 0;">暂无上传记录</p>` : `
+    <div style="max-height:400px;overflow-y:auto;">
+      <table class="admin-table" style="width:100%;">
+        <thead><tr><th>标题</th><th>分类</th><th>分辨率</th><th>状态</th><th>时间</th></tr></thead>
+        <tbody>${history.map(h => `
+          <tr>
+            <td>${h.title}</td><td>${h.cat}</td><td>${h.res}</td>
+            <td><span class="badge-cell ${h.status==='pending'?'badge-pending':'badge-approved'}">${h.status==='pending'?'待审核':'已发布'}</span></td>
+            <td style="font-size:0.75rem;color:var(--text-dim);">${new Date(h.time).toLocaleString('zh-CN')}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>`}
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">关闭</button>
+    </div>
+  `, 'user-modal');
 }
 
 // ====== 管理后台 ======
@@ -802,11 +1620,13 @@ function renderAdmin() {
         <div class="admin-tab${adminTab==='dashboard'?' active':''}" onclick="adminTab='dashboard';renderAdmin();">📈 数据看板</div>
         <div class="admin-tab${adminTab==='assets'?' active':''}" onclick="adminTab='assets';renderAdmin();">📋 素材管理</div>
         <div class="admin-tab${adminTab==='review'?' active':''}" onclick="adminTab='review';renderAdmin();">⏳ 审核队列 ${stats.pending?`<span style="background:var(--accent);color:#fff;border-radius:10px;padding:1px 8px;font-size:0.7rem;margin-left:6px;">${stats.pending}</span>`:''}</div>
+        <div class="admin-tab${adminTab==='pexels'?' active':''}" onclick="adminTab='pexels';renderAdmin();">🎬 Pexels API</div>
       </div>
 
       ${adminTab==='dashboard' ? renderAdminDashboard(stats) : ''}
       ${adminTab==='assets' ? renderAdminAssets() : ''}
       ${adminTab==='review' ? renderAdminReview() : ''}
+      ${adminTab==='pexels' ? renderAdminPexels() : ''}
     </div>
   `;
 }
@@ -917,6 +1737,7 @@ function adminBatchDelete() {
 }
 function adminConfirmBatchDelete(ids) {
   ids.forEach(id => { const idx = ASSETS.findIndex(x => x.id === id); if (idx >= 0) ASSETS.splice(idx, 1); });
+  persistAssets();
   closeAdminModal();
   showToast(`${ids.length} 个素材已删除`);
   renderAdmin();
@@ -948,13 +1769,14 @@ function renderAdminReview() {
 
 function adminApprove(id) {
   const a = ASSETS.find(x => x.id === id);
-  if (a) { a.status = 'approved'; showToast(`「${a.title}」审核通过`); renderAdmin(); }
+  if (a) { a.status = 'approved'; persistAssets(); showToast(`「${a.title}」审核通过`); renderAdmin(); }
 }
 function adminReject(id) {
   const idx = ASSETS.findIndex(x => x.id === id);
   if (idx >= 0) {
     const title = ASSETS[idx].title;
     ASSETS.splice(idx, 1);
+    persistAssets();
     showToast(`「${title}」已拒绝并移除`);
     renderAdmin();
   }
@@ -989,6 +1811,7 @@ function adminSaveEdit(id) {
   a.fps = parseInt(document.getElementById('editFps')?.value) || a.fps;
   a.badge = document.getElementById('editLicense')?.value || a.badge;
   a.desc = document.getElementById('editDesc')?.value || a.desc;
+  persistAssets();
   closeAdminModal();
   showToast(`素材 #${id} 已更新`);
   renderAdmin();
@@ -1011,7 +1834,7 @@ function adminDeleteAsset(id) {
 }
 function adminConfirmDelete(id) {
   const idx = ASSETS.findIndex(x => x.id === id);
-  if (idx >= 0) { ASSETS.splice(idx, 1); }
+  if (idx >= 0) { ASSETS.splice(idx, 1); persistAssets(); }
   closeAdminModal();
   showToast(`素材 #${id} 已删除`);
   renderAdmin();
@@ -1055,6 +1878,7 @@ function adminConfirmAdd() {
     desc: document.getElementById('addDesc')?.value || '',
     status: 'approved'
   });
+  persistAssets();
   closeAdminModal();
   showToast(`「${title}」已添加`);
   renderAdmin();
@@ -1076,6 +1900,45 @@ function adminExportCSV() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast(`已导出 ${ASSETS.length} 条数据`);
+}
+
+function renderAdminPexels() {
+  const hasKey = !!PEXELS_KEY;
+  return `
+    <div class="admin-section-title">🎬 Pexels API 设置</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;max-width:600px;">
+      <p style="margin-bottom:8px;font-weight:600;">API Key</p>
+      <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:16px;">
+        在 <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--accent);">pexels.com/api</a> 免费注册获取 API Key。
+        免费额度：200 请求/小时，20,000 请求/月。
+      </p>
+      <div style="display:flex;gap:10px;">
+        <input type="password" id="pexelsApiKeyInput" placeholder="${hasKey ? '••••••••••••'+(PEXELS_KEY.slice(-4)) : '输入 Pexels API Key'}" 
+          style="flex:1;padding:10px 14px;background:var(--input-bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.9rem;outline:none;">
+        <button class="btn btn-primary" onclick="adminSavePexelsKey()">保存</button>
+        ${hasKey ? `<button class="btn btn-outline" onclick="adminClearPexelsKey()" style="color:var(--danger);border-color:rgba(255,118,117,0.4);">清除</button>` : ''}
+      </div>
+      <p style="color:var(--success);font-size:0.8rem;margin-top:12px;${hasKey?'':'display:none'}" id="pexelsStatus">已配置 API Key (${PEXELS_KEY.slice(0,6)}...)</p>
+      <div style="margin-top:20px;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);">
+        <p style="font-size:0.82rem;color:var(--text-dim);line-height:1.6;">
+          配置后在素材库首页点击 <strong>"Pexels 搜索"</strong> 按钮即可实时搜索 Pexels 视频素材，
+          包括真实视频预览播放和下载功能。
+        </p>
+      </div>
+    </div>
+  `;
+}
+function adminSavePexelsKey() {
+  const key = (document.getElementById('pexelsApiKeyInput')?.value || '').trim();
+  if (!key) { showToast('请输入 API Key'); return; }
+  setPexelsKey(key);
+  const status = document.getElementById('pexelsStatus');
+  if (status) { status.style.display = ''; status.textContent = '已配置 API Key (' + key.slice(0, 6) + '...)'; }
+  location.reload();
+}
+function adminClearPexelsKey() {
+  setPexelsKey('');
+  location.reload();
 }
 
 function showShortcuts() {
@@ -1162,6 +2025,8 @@ function renderRoute() {
     renderAbout();
   } else if (route === '/upload') {
     renderUpload();
+  } else if (route === '/favorites') {
+    renderFavorites();
   } else if (route === '/admin') {
     renderAdmin();
   } else {
@@ -1189,6 +2054,8 @@ document.addEventListener('click', function(e) {
 
 // 初始化快捷键
 initKeyboardShortcuts();
+// 初始化用户菜单
+renderUserMenu();
 </script>
 </body>
 </html>
