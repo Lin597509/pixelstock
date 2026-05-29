@@ -166,6 +166,18 @@
     background:var(--accent-glow); color:var(--accent); font-weight:600;
     border-left-color:var(--accent);
   }
+  .cat-parent-wrap { display:flex; flex-direction:column; }
+  .cat-parent { position:relative; }
+  .cat-arrow { margin-left:auto; font-size:0.6rem; transition:transform 0.25s; color:var(--text-dim); }
+  .cat-arrow.expanded { transform:rotate(90deg); }
+  .subcat-list { max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease; background:var(--surface2); }
+  .subcat-list.show { max-height:500px; padding:6px 0; }
+  .subcat-item {
+    padding:7px 20px 7px 54px; font-size:0.8rem; cursor:pointer; transition:all 0.15s;
+    color:var(--text-dim); border-left:3px solid transparent;
+  }
+  .subcat-item:hover { background:var(--surface); color:var(--text); }
+  .subcat-item.active { color:var(--accent); font-weight:600; border-left-color:var(--accent-info); background:var(--accent-glow); }
   .cat-icon { font-size:1.1rem; width:24px; text-align:center; flex-shrink:0; }
   .cat-name { white-space:nowrap; }
   .main-content { flex:1; min-width:0; }
@@ -519,6 +531,11 @@
     .category-list { flex-direction:row; flex-wrap:wrap; gap:4px; padding:0 12px; }
     .cat-item { padding:6px 12px; border-left:none; border-radius:20px; font-size:0.78rem; gap:4px; }
     .cat-item.active { border-left:none; border-radius:20px; }
+    .cat-parent-wrap { flex-direction:column; width:100%; }
+    .subcat-item { padding:5px 12px; font-size:0.7rem; border-left:none; border-radius:12px; }
+    .subcat-list { background:transparent; }
+    .subcat-list.show { padding:4px 0 4px 8px; }
+    .cat-arrow { display:none; }
     .cat-icon { font-size:0.85rem; width:auto; }
     .sidebar-title { display:none; }
     .nav-links { display:none; }
@@ -696,6 +713,20 @@ function persistAssets() { localStorage.setItem(ASSETS_KEY, JSON.stringify(ASSET
 const cats = ['全部', ...new Set(ASSETS.map(a=>a.cat))];
 let activeCat = '全部';
 let currentAsset = null;
+let expandedCats = {}; // 展开状态记录
+const catTree = {
+  '自然风光': ['山川', '海洋', '森林', '极光', '星空', '沙漠'],
+  '城市建筑': ['现代都市', '夜景灯光', '古典建筑', '室内空间', '街道巷弄'],
+  '科技特效': ['HUD界面', '粒子特效', '信号损坏', '数据流动', '赛博朋克'],
+  '特效转场': ['平滑过渡', '故障转场', '光效转场', '模糊转场'],
+  '动物世界': ['野生动物', '宠物萌宠', '海洋生物', '鸟类', '昆虫'],
+  '美食饮品': ['烹饪制作', '饮品特调', '甜品烘焙', '美食探店'],
+  '体育运动': ['篮球', '足球', '极限运动', '健身瑜伽', '游泳'],
+  '人物生活': ['日常Vlog', '商务办公', '家庭温馨', '旅行探险'],
+  '商业金融': ['股票交易', '数据分析', '商务会议', '写字楼'],
+  '医疗健康': ['医疗器械', '健康运动', '实验室', '医护场景'],
+  '教育学习': ['课堂教学', '在线学习', '科学实验', '阅读书房', '编程开发'],
+};
 
 // ====== Pexels API ======
 const PEXELS_KEY = localStorage.getItem('pexels_api_key') || '';
@@ -964,7 +995,20 @@ function renderHome() {
       <aside class="category-sidebar">
         <h3 class="sidebar-title">素材分类</h3>
         <div class="category-list">
-          ${cats.map(c=>`<div class="cat-item${c===activeCat?' active':''}" onclick="pickCategory('${c}')"><span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${c}</span></div>`).join('')}
+          <div class="cat-item${activeCat==='全部'?' active':''}" onclick="pickCategory('全部')"><span class="cat-icon">${catIcon('全部')}</span><span class="cat-name">全部</span></div>
+          ${cats.filter(c=>c!=='全部').map(c=>`
+            <div class="cat-parent-wrap">
+              <div class="cat-item cat-parent${activeCat===c?' active':''}" onclick="toggleCatExpand('${c}')">
+                <span class="cat-icon">${catIcon(c)}</span><span class="cat-name">${c}</span>
+                <span class="cat-arrow${expandedCats[c]?' expanded':''}">▶</span>
+              </div>
+              <div class="subcat-list${expandedCats[c]?' show':''}" id="subcat-${c}">
+                ${(catTree[c]||[]).map(sc=>`
+                  <div class="subcat-item${activeCat===sc?' active':''}" onclick="event.stopPropagation();pickSubCategory('${sc}','${c}')">${sc}</div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
         </div>
       </aside>
       <div class="main-content">
@@ -1018,6 +1062,38 @@ function setCategory(cat){
     }
   }
   renderHome();
+}
+
+function toggleCatExpand(cat) {
+  expandedCats[cat] = !expandedCats[cat];
+  activeCat = cat;
+  if (pexelsEnabled) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = cat;
+    searchPexels(cat);
+    return;
+  }
+  // 非 Pexels 模式也触发切换
+  renderHome();
+}
+
+function pickSubCategory(subcat, parentCat) {
+  expandedCats[parentCat] = true;
+  activeCat = subcat;
+  if (pexelsEnabled) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = subcat;
+    searchPexels(subcat);
+  } else {
+    // 非 Pexels: 设为父分类高亮并过滤本地素材
+    activeCat = parentCat;
+    renderHome();
+    // 侧边栏恢复子分类高亮
+    activeCat = subcat;
+    document.querySelectorAll('.subcat-item').forEach(el => {
+      el.classList.toggle('active', el.textContent.trim() === subcat);
+    });
+  }
 }
 
 function pickCategory(cat) {
