@@ -926,7 +926,7 @@ function renderAssetCard(a,i){
     badgeHTML = '<span class="card-badge pro">PRO</span>';
   }
   var bgStyle = a.thumbnail ? 'url('+a.thumbnail+') center/cover no-repeat' : 'linear-gradient(135deg,#1a1a2e,#16213e)';
-  var clickHandler = a.pexels ? 'openPexelsPreview(\''+a.id+'\')' : 'openPreview('+a.id+')';
+  var clickHandler = a.pexels ? 'openPexelsPreview(\''+a.id+'\')' : 'openPreview(\''+a.id+'\')';
   return '<div class="card reveal" style="animation-delay:'+(i*0.05)+'s" onclick="'+clickHandler+'">'+
     '<div class="card-thumb" style="background:'+bgStyle+';">'+thumbHTML+badgeHTML+'</div>'+
     '<div class="card-body">'+
@@ -1200,7 +1200,7 @@ function renderDetail(id) {
         </div>
         <div class="filter-tags" style="margin-bottom:24px;"><span class="tag active">${a.cat}</span><span class="tag">${a.res}</span><span class="tag">${a.format}</span></div>
         <div class="detail-actions">
-          <button class="btn btn-download btn-lg" onclick="downloadAsset(${a.id})">⬇ 下载素材 (${a.size})</button>
+          <button class="btn btn-download btn-lg" onclick="downloadAsset('${a.id}')">⬇ 下载素材 (${a.size})</button>
           <button class="btn btn-fav btn-lg fav-btn${isFavorited(a.id)?' favorited':''}" data-id="${a.id}" onclick="toggleFavorite('${a.id}',event)" style="font-size:1rem;">${favIconHtml(a.id)} ${isFavorited(a.id)?'已收藏':'加入收藏'}</button>
           <button class="btn btn-outline btn-lg" onclick="navigate('/')">返回列表</button>
         </div>
