@@ -735,15 +735,30 @@ const ASSETS = [
   { id:18, title:'手术室无影灯',   cat:'医疗健康', res:'4K', dur:'0:15', size:'110MB', fps:24, format:'MP4', badge:'pro',    desc:'现代化手术室设备展示，干净明亮的医疗环境素材。' },
   { id:19, title:'儿童课堂互动',   cat:'教育学习', res:'4K', dur:'0:33', size:'200MB', fps:30, format:'MP4', badge:'free',   desc:'小朋友在课堂上积极举手互动，适合教育类宣传视频。' },
   { id:20, title:'极光舞动夜空',   cat:'自然风光', res:'8K', dur:'1:10', size:'620MB', fps:24, format:'MP4', badge:'pro',    desc:'冰岛极光在夜空中舞动的延时摄影，色彩斑斓令人惊叹。' },
+  { id:21, title:'桌面录制 2026-06-01', cat:'教育学习', res:'1080p', dur:'1:12', size:'85MB', fps:30, format:'MP4', badge:'free', desc:'Windows 桌面服务录制视频，适合教程制作和技术分享。', uploaded:true, status:'approved', videoPath:'desktop-recording-2026-06-01.mp4', fileName:'desktop-recording-2026-06-01.mp4' },
 ];
 
 // === 数据持久化 ===
 const ASSETS_KEY = 'pixelstock_assets';
 function persistAssets() { localStorage.setItem(ASSETS_KEY, JSON.stringify(ASSETS)); }
+// 保存 HTML 中定义的默认素材快照（持久化逻辑中用于合并，不可被覆盖）
+const DEFAULT_ASSETS = [...ASSETS];
 (function(){
   const saved = localStorage.getItem(ASSETS_KEY);
-  if (saved) { const arr=JSON.parse(saved); ASSETS.length=0; ASSETS.push(...arr); }
-  else persistAssets();
+  if (saved) {
+    const savedArr = JSON.parse(saved);
+    const savedIds = new Set(savedArr.map(a => String(a.id)));
+    ASSETS.length = 0;
+    ASSETS.push(...savedArr);
+    // 把 DEFAULT_ASSETS 中 localStorage 没有的条目追加进去（自动处理任意数量）
+    let added = false;
+    DEFAULT_ASSETS.forEach(a => {
+      if (!savedIds.has(String(a.id))) { ASSETS.push(a); added = true; }
+    });
+    if (added) persistAssets();
+  } else {
+    persistAssets();
+  }
 })();
 
 const cats = ['全部', ...new Set(ASSETS.map(a=>a.cat))];
@@ -773,6 +788,21 @@ let pexelsLoading = false;
 let pexelsPage = 1;
 let pexelsQuery = '';
 let pexelsHasMore = false;
+
+// 自动启用 Pexels：有 API Key 时启动即加载真实视频
+(function autoInitPexels() {
+  if (!PEXELS_KEY) return;
+  pexelsEnabled = true;
+  pexelsLoading = true;
+  fetchPexelsVideos('nature', 1).then(() => {
+    if (pexelsResults.length === 0) {
+      // Pexels 无结果则回退到本地素材
+      pexelsEnabled = false;
+    }
+    const grid = document.getElementById('assetGrid');
+    if (grid) renderGrid();
+  });
+})();
 
 function setPexelsKey(key) {
   localStorage.setItem('pexels_api_key', key);
@@ -854,7 +884,7 @@ function togglePexels() {
   pexelsEnabled = !pexelsEnabled;
   if (pexelsEnabled && PEXELS_KEY) {
     const q = (document.getElementById('searchInput') || {}).value || '';
-    if (q && q.length >= 2) searchPexels(q);
+    searchPexels(q && q.length >= 2 ? q : 'nature');
   }
   renderGrid();
 }
@@ -912,8 +942,16 @@ function renderAssetCard(a,i){
   var favText = isFavorited(a.id) ? ' 已收藏' : ' 收藏';
   actions.push('<button class="btn btn-icon btn-sm fav-btn-card'+favClass+'" onclick="event.stopPropagation();toggleFavorite(\''+a.id+'\',event)" style="display:inline-flex;align-items:center;gap:4px;">'+favIconHtml(a.id)+favText+'</button>');
   var thumbHTML = '';
-  if(a.thumbnail){
+  var bgStyle = '';
+  if(a.videoPath){
+    // 有本地视频文件：卡片上直接显示视频预览
+    thumbHTML = '<video src="'+a.videoPath+'" muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block;" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0;"></video>';
+    bgStyle = '#000';
+  } else if(a.thumbnail){
     thumbHTML = '<img src="'+a.thumbnail+'" style="width:100%;height:100%;object-fit:cover;display:block;" alt="'+a.title+'" loading="lazy">';
+    bgStyle = 'url('+a.thumbnail+') center/cover no-repeat';
+  } else {
+    bgStyle = 'linear-gradient(135deg,#1a1a2e,#16213e)';
   }
   var badgeHTML = '';
   if(a.uploaded){
@@ -925,7 +963,6 @@ function renderAssetCard(a,i){
   } else {
     badgeHTML = '<span class="card-badge pro">PRO</span>';
   }
-  var bgStyle = a.thumbnail ? 'url('+a.thumbnail+') center/cover no-repeat' : 'linear-gradient(135deg,#1a1a2e,#16213e)';
   var clickHandler = a.pexels ? 'openPexelsPreview(\''+a.id+'\')' : 'openPreview(\''+a.id+'\')';
   return '<div class="card reveal" style="animation-delay:'+(i*0.05)+'s" onclick="'+clickHandler+'">'+
     '<div class="card-thumb" style="background:'+bgStyle+';">'+thumbHTML+badgeHTML+'</div>'+
@@ -944,22 +981,29 @@ function openPreview(id) {
   
   // 真实上传素材：显示实际视频
   if(currentAsset.uploaded){
-    getVideoFile(String(id)).then(rec => {
-      if(rec){
-        const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
-        const url = URL.createObjectURL(blob);
-        document.getElementById('modalPreview').innerHTML=`
-          <div class="video-player-wrap">
-            <video src="${url}" controls preload="metadata"
-              style="width:100%;max-height:60vh;border-radius:var(--radius);display:block;"></video>
-          </div>`;
-        // 清理 blob URL
-        const vid = document.querySelector('#modalPreview video');
-        if(vid) vid.addEventListener('loadeddata', () => { /* keep URL alive during playback */ });
-      }
-    }).catch(() => {
-      document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.size}</span></div>`;
-    });
+    if(currentAsset.videoPath){
+      // 优先使用相对路径直接加载视频
+      document.getElementById('modalPreview').innerHTML=`
+        <div class="video-player-wrap">
+          <video src="${currentAsset.videoPath}" controls preload="metadata"
+            style="width:100%;max-height:60vh;border-radius:var(--radius);display:block;"></video>
+        </div>`;
+    } else {
+      // 回退到 IndexedDB
+      getVideoFile(String(id)).then(rec => {
+        if(rec){
+          const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+          const url = URL.createObjectURL(blob);
+          document.getElementById('modalPreview').innerHTML=`
+            <div class="video-player-wrap">
+              <video src="${url}" controls preload="metadata"
+                style="width:100%;max-height:60vh;border-radius:var(--radius);display:block;"></video>
+            </div>`;
+        }
+      }).catch(() => {
+        document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.size}</span></div>`;
+      });
+    }
   } else {
     document.getElementById('modalPreview').innerHTML=`<div class="preview-placeholder" style="background:${thumbBg(currentAsset.id)};"><span class="preview-icon">🎬</span><span class="preview-meta">${currentAsset.res} / ${currentAsset.format} / ${currentAsset.dur}</span></div>`;
   }
@@ -991,25 +1035,34 @@ function downloadAsset(id){
     showToast(`下载完成！`);
     return;
   }
-  // 真实上传的素材：从 IndexedDB 获取并下载
+  // 真实上传的素材：优先使用 videoPath 直接下载，回退到 IndexedDB
   const a=ASSETS.find(x=>String(x.id)===idStr);
   if(!a){showToast('素材不存在');return;}
   if(a.uploaded){
-    showToast(`正在下载「${a.title}」...`);
-    getVideoFile(idStr).then(rec => {
-      if(!rec){showToast('文件未找到');return;}
-      const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
-      const url = URL.createObjectURL(blob);
+    if(a.videoPath){
+      showToast(`正在下载「${a.title}」...`);
       const link = document.createElement('a');
-      link.href = url;
-      link.download = rec.name || (a.title + '.' + (a.format||'mp4').toLowerCase());
+      link.href = a.videoPath;
+      link.download = a.fileName || (a.title + '.' + (a.format||'mp4').toLowerCase());
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast(`「${a.title}」下载完成！`);
-    }).catch(err => {
-      console.error(err);
-      showToast('下载失败，请重试');
-    });
+    } else {
+      showToast(`正在下载「${a.title}」...`);
+      getVideoFile(idStr).then(rec => {
+        if(!rec){showToast('文件未找到');return;}
+        const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = rec.name || (a.title + '.' + (a.format||'mp4').toLowerCase());
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`「${a.title}」下载完成！`);
+      }).catch(err => {
+        console.error(err);
+        showToast('下载失败，请重试');
+      });
+    }
     return;
   }
   // 模拟素材：仅提示
@@ -1052,6 +1105,16 @@ function filterAssets() {
 function renderHome() {
   const app=document.getElementById('app');
   const hasKey = !!PEXELS_KEY;
+  // 有 Pexels Key 时自动启用 Pexels 搜索
+  if (hasKey && !pexelsEnabled) {
+    pexelsEnabled = true;
+    if (!pexelsLoading && pexelsResults.length === 0) {
+      pexelsLoading = true;
+      fetchPexelsVideos('nature', 1).then(() => {
+        renderGrid();
+      });
+    }
+  }
   app.innerHTML=`
     <section class="hero"><h1>高质量<span>视频素材</span>一站下载</h1><p>精选 4K / 8K 高清素材，覆盖自然风光、城市夜景、科技特效等多种场景，助你快速产出专业级视频。</p><div class="hero-stats"><div class="hero-stat"><div class="num">200+</div><div class="label">高清素材</div></div><div class="hero-stat"><div class="num">4K / 8K</div><div class="label">最高分辨率</div></div><div class="hero-stat"><div class="num">免费</div><div class="label">个人 &amp; 商用</div></div></div></section>
     <div class="toolbar">
@@ -1107,15 +1170,10 @@ function renderGrid() {
 function setCategory(cat){
   activeCat = cat;
   if (pexelsEnabled) {
-    if (cat === '全部') {
-      pexelsEnabled = false;
-      pexelsResults = [];
-    } else {
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput) searchInput.value = cat;
-      searchPexels(cat);
-      return;
-    }
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = cat === '全部' ? '' : cat;
+    searchPexels(cat === '全部' ? 'nature' : cat);
+    return;
   }
   renderHome();
 }
@@ -1169,7 +1227,7 @@ function onSearchInput() {
     clearTimeout(window._pexelsDebounce);
     window._pexelsDebounce = setTimeout(() => {
       const q = (document.getElementById('searchInput')||{}).value||'';
-      if (q.length >= 2) { searchPexels(q); } else { pexelsResults=[]; renderGrid(); }
+      if (q.length >= 2) { searchPexels(q); } else { searchPexels('nature'); }
     }, 500);
   } else { renderGrid(); }
 }
@@ -1209,13 +1267,18 @@ function renderDetail(id) {
   `;
   // 加载真实视频
   if(a.uploaded){
-    getVideoFile(String(id)).then(rec => {
+    if(a.videoPath){
       const vid = document.getElementById('detailVideo');
-      if(vid && rec){
-        const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
-        vid.src = URL.createObjectURL(blob);
-      }
-    }).catch(() => {});
+      if(vid) vid.src = a.videoPath;
+    } else {
+      getVideoFile(String(id)).then(rec => {
+        const vid = document.getElementById('detailVideo');
+        if(vid && rec){
+          const blob = new Blob([rec.data], { type: rec.type || 'video/mp4' });
+          vid.src = URL.createObjectURL(blob);
+        }
+      }).catch(() => {});
+    }
   }
 }
 
